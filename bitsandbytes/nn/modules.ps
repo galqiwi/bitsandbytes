@@ -1,0 +1,3328 @@
+%!PS-Adobe-3.0
+%%BoundingBox: 18 36 577 806
+%%Title: Enscript Output
+%%Creator: GNU Enscript 1.6.5.90
+%%CreationDate: Tue Jul 16 04:08:21 2024
+%%Orientation: Portrait
+%%Pages: (atend)
+%%DocumentMedia: A4 595 842 0 () ()
+%%DocumentNeededResources: (atend)
+%%EndComments
+%%BeginProlog
+%%BeginResource: procset Enscript-Prolog 1.6.5 90
+%
+% Procedures.
+%
+
+/_S {	% save current state
+  /_s save def
+} def
+/_R {	% restore from saved state
+  _s restore
+} def
+
+/S {	% showpage protecting gstate
+  gsave
+  showpage
+  grestore
+} bind def
+
+/MF {	% fontname newfontname -> -	make a new encoded font
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  % insert only valid encoding vectors
+  encoding_vector length 256 eq {
+    newfont /Encoding encoding_vector put
+  } if
+
+  newfontname newfont definefont pop
+} def
+
+/MF_PS { % fontname newfontname -> -	make a new font preserving its enc
+  /newfontname exch def
+  /fontname exch def
+
+  /fontdict fontname findfont def
+  /newfont fontdict maxlength dict def
+
+  fontdict {
+    exch
+    dup /FID eq {
+      % skip FID pair
+      pop pop
+    } {
+      % copy to the new font dictionary
+      exch newfont 3 1 roll put
+    } ifelse
+  } forall
+
+  newfont /FontName newfontname put
+
+  newfontname newfont definefont pop
+} def
+
+/SF { % fontname width height -> -	set a new font
+  /height exch def
+  /width exch def
+
+  findfont
+  [width 0 0 height 0 0] makefont setfont
+} def
+
+/SUF { % fontname width height -> -	set a new user font
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF
+  /F-gs-user-font width height SF
+} def
+
+/SUF_PS { % fontname width height -> -	set a new user font preserving its enc
+  /height exch def
+  /width exch def
+
+  /F-gs-user-font MF_PS
+  /F-gs-user-font width height SF
+} def
+
+/M {moveto} bind def
+/s {show} bind def
+
+/Box {	% x y w h -> -			define box path
+  /d_h exch def /d_w exch def /d_y exch def /d_x exch def
+  d_x d_y  moveto
+  d_w 0 rlineto
+  0 d_h rlineto
+  d_w neg 0 rlineto
+  closepath
+} def
+
+/bgs {	% x y height blskip gray str -> -	show string with bg color
+  /str exch def
+  /gray exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    gray setgray
+    fill
+  grestore
+  x y M str s
+} def
+
+/bgcs { % x y height blskip red green blue str -> -  show string with bg color
+  /str exch def
+  /blue exch def
+  /green exch def
+  /red exch def
+  /blskip exch def
+  /height exch def
+  /y exch def
+  /x exch def
+
+  gsave
+    x y blskip sub str stringwidth pop height Box
+    red green blue setrgbcolor
+    fill
+  grestore
+  x y M str s
+} def
+
+% Highlight bars.
+/highlight_bars {	% nlines lineheight output_y_margin gray -> -
+  gsave
+    setgray
+    /ymarg exch def
+    /lineheight exch def
+    /nlines exch def
+
+    % This 2 is just a magic number to sync highlight lines to text.
+    0 d_header_y ymarg sub 2 sub translate
+
+    /cw d_output_w cols div def
+    /nrows d_output_h ymarg 2 mul sub lineheight div cvi def
+
+    % for each column
+    0 1 cols 1 sub {
+      cw mul /xp exch def
+
+      % for each rows
+      0 1 nrows 1 sub {
+        /rn exch def
+        rn lineheight mul neg /yp exch def
+        rn nlines idiv 2 mod 0 eq {
+	  % Draw highlight bar.  4 is just a magic indentation.
+	  xp 4 add yp cw 8 sub lineheight neg Box fill
+	} if
+      } for
+    } for
+
+  grestore
+} def
+
+% Line highlight bar.
+/line_highlight {	% x y width height gray -> -
+  gsave
+    /gray exch def
+    Box gray setgray fill
+  grestore
+} def
+
+% Column separator lines.
+/column_lines {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h translate
+    /cw d_output_w cols div def
+    1 1 cols 1 sub {
+      cw mul 0 moveto
+      0 d_output_h rlineto stroke
+    } for
+  grestore
+} def
+
+% Column borders.
+/column_borders {
+  gsave
+    .1 setlinewidth
+    0 d_footer_h moveto
+    0 d_output_h rlineto
+    d_output_w 0 rlineto
+    0 d_output_h neg rlineto
+    closepath stroke
+  grestore
+} def
+
+% Do the actual underlay drawing
+/draw_underlay {
+  ul_style 0 eq {
+    ul_str true charpath stroke
+  } {
+    ul_str show
+  } ifelse
+} def
+
+% Underlay
+/underlay {	% - -> -
+  gsave
+    0 d_page_h translate
+    d_page_h neg d_page_w atan rotate
+
+    ul_gray setgray
+    ul_font setfont
+    /dw d_page_h dup mul d_page_w dup mul add sqrt def
+    ul_str stringwidth pop dw exch sub 2 div ul_h_ptsize -2 div moveto
+    draw_underlay
+  grestore
+} def
+
+/user_underlay {	% - -> -
+  gsave
+    ul_x ul_y translate
+    ul_angle rotate
+    ul_gray setgray
+    ul_font setfont
+    0 0 ul_h_ptsize 2 div sub moveto
+    draw_underlay
+  grestore
+} def
+
+% Page prefeed
+/page_prefeed {		% bool -> -
+  statusdict /prefeed known {
+    statusdict exch /prefeed exch put
+  } {
+    pop
+  } ifelse
+} def
+
+% Wrapped line markers
+/wrapped_line_mark {	% x y charwith charheight type -> -
+  /type exch def
+  /h exch def
+  /w exch def
+  /y exch def
+  /x exch def
+
+  type 2 eq {
+    % Black boxes (like TeX does)
+    gsave
+      0 setlinewidth
+      x w 4 div add y M
+      0 h rlineto w 2 div 0 rlineto 0 h neg rlineto
+      closepath fill
+    grestore
+  } {
+    type 3 eq {
+      % Small arrows
+      gsave
+        .2 setlinewidth
+        x w 2 div add y h 2 div add M
+        w 4 div 0 rlineto
+        x w 4 div add y lineto stroke
+
+        x w 4 div add w 8 div add y h 4 div add M
+        x w 4 div add y lineto
+	w 4 div h 8 div rlineto stroke
+      grestore
+    } {
+      % do nothing
+    } ifelse
+  } ifelse
+} def
+
+% EPSF import.
+
+/BeginEPSF {
+  /b4_Inc_state save def    		% Save state for cleanup
+  /dict_count countdictstack def	% Count objects on dict stack
+  /op_count count 1 sub def		% Count objects on operand stack
+  userdict begin
+  /showpage { } def
+  0 setgray 0 setlinecap
+  1 setlinewidth 0 setlinejoin
+  10 setmiterlimit [ ] 0 setdash newpath
+  /languagelevel where {
+    pop languagelevel
+    1 ne {
+      false setstrokeadjust false setoverprint
+    } if
+  } if
+} bind def
+
+/EndEPSF {
+  count op_count sub { pos } repeat	% Clean up stacks
+  countdictstack dict_count sub { end } repeat
+  b4_Inc_state restore
+} bind def
+
+% Check PostScript language level.
+/languagelevel where {
+  pop /gs_languagelevel languagelevel def
+} {
+  /gs_languagelevel 1 def
+} ifelse
+%%EndResource
+%%BeginResource: procset Enscript-Encoding-88591 1.6.5 90
+/encoding_vector [
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclam       	/quotedbl     	/numbersign   	
+/dollar       	/percent      	/ampersand    	/quoteright   	
+/parenleft    	/parenright   	/asterisk     	/plus         	
+/comma        	/hyphen       	/period       	/slash        	
+/zero         	/one          	/two          	/three        	
+/four         	/five         	/six          	/seven        	
+/eight        	/nine         	/colon        	/semicolon    	
+/less         	/equal        	/greater      	/question     	
+/at           	/A            	/B            	/C            	
+/D            	/E            	/F            	/G            	
+/H            	/I            	/J            	/K            	
+/L            	/M            	/N            	/O            	
+/P            	/Q            	/R            	/S            	
+/T            	/U            	/V            	/W            	
+/X            	/Y            	/Z            	/bracketleft  	
+/backslash    	/bracketright 	/asciicircum  	/underscore   	
+/quoteleft    	/a            	/b            	/c            	
+/d            	/e            	/f            	/g            	
+/h            	/i            	/j            	/k            	
+/l            	/m            	/n            	/o            	
+/p            	/q            	/r            	/s            	
+/t            	/u            	/v            	/w            	
+/x            	/y            	/z            	/braceleft    	
+/bar          	/braceright   	/tilde        	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/.notdef      	/.notdef      	/.notdef      	/.notdef      	
+/space        	/exclamdown   	/cent         	/sterling     	
+/currency     	/yen          	/brokenbar    	/section      	
+/dieresis     	/copyright    	/ordfeminine  	/guillemotleft	
+/logicalnot   	/hyphen       	/registered   	/macron       	
+/degree       	/plusminus    	/twosuperior  	/threesuperior	
+/acute        	/mu           	/paragraph    	/bullet       	
+/cedilla      	/onesuperior  	/ordmasculine 	/guillemotright	
+/onequarter   	/onehalf      	/threequarters	/questiondown 	
+/Agrave       	/Aacute       	/Acircumflex  	/Atilde       	
+/Adieresis    	/Aring        	/AE           	/Ccedilla     	
+/Egrave       	/Eacute       	/Ecircumflex  	/Edieresis    	
+/Igrave       	/Iacute       	/Icircumflex  	/Idieresis    	
+/Eth          	/Ntilde       	/Ograve       	/Oacute       	
+/Ocircumflex  	/Otilde       	/Odieresis    	/multiply     	
+/Oslash       	/Ugrave       	/Uacute       	/Ucircumflex  	
+/Udieresis    	/Yacute       	/Thorn        	/germandbls   	
+/agrave       	/aacute       	/acircumflex  	/atilde       	
+/adieresis    	/aring        	/ae           	/ccedilla     	
+/egrave       	/eacute       	/ecircumflex  	/edieresis    	
+/igrave       	/iacute       	/icircumflex  	/idieresis    	
+/eth          	/ntilde       	/ograve       	/oacute       	
+/ocircumflex  	/otilde       	/odieresis    	/divide       	
+/oslash       	/ugrave       	/uacute       	/ucircumflex  	
+/udieresis    	/yacute       	/thorn        	/ydieresis    	
+] def
+%%EndResource
+%%EndProlog
+%%BeginSetup
+%%IncludeResource: font Courier-Bold
+%%IncludeResource: font Courier
+/HFpt_w 10 def
+/HFpt_h 10 def
+/Courier-Bold /HF-gs-font MF
+/HF /HF-gs-font findfont [HFpt_w 0 0 HFpt_h 0 0] makefont def
+/Courier /F-gs-font MF
+/F-gs-font 9 9 SF
+/#copies 1 def
+% Pagedevice definitions:
+gs_languagelevel 1 gt {
+  <<
+    /PageSize [595 842] 
+  >> setpagedevice
+} if
+%%BeginResource: procset Enscript-Header-simple 1.6.5 90
+
+/do_header {	% print default simple header
+  gsave
+    d_header_x d_header_y HFpt_h 3 div add translate
+
+    HF setfont
+    user_header_p {
+      5 0 moveto user_header_left_str show
+
+      d_header_w user_header_center_str stringwidth pop sub 2 div
+      0 moveto user_header_center_str show
+
+      d_header_w user_header_right_str stringwidth pop sub 5 sub
+      0 moveto user_header_right_str show
+    } {
+      5 0 moveto fname show
+      45 0 rmoveto fmodstr show
+      45 0 rmoveto pagenumstr show
+    } ifelse
+
+  grestore
+} def
+%%EndResource
+/d_page_w 559 def
+/d_page_h 770 def
+/d_header_x 0 def
+/d_header_y 755 def
+/d_header_w 559 def
+/d_header_h 15 def
+/d_footer_x 0 def
+/d_footer_y 0 def
+/d_footer_w 559 def
+/d_footer_h 0 def
+/d_output_w 559 def
+/d_output_h 755 def
+/cols 1 def
+%%EndSetup
+%%Page: (1) 1
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 1 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (1) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+27.6 743 M (1:) s
+43.8 743 M
+(# Copyright \(c\) Facebook, Inc. and its affiliates.) s
+27.6 733 M (2:) s
+43.8 733 M
+(#) s
+27.6 723 M (3:) s
+43.8 723 M
+(# This source code is licensed under the MIT license found in the) s
+27.6 713 M (4:) s
+43.8 713 M
+(# LICENSE file in the root directory of this source tree.) s
+27.6 703 M (5:) s
+43.8 703 M
+(import copy) s
+27.6 693 M (6:) s
+43.8 693 M
+(from typing import Any, Dict, Optional, TypeVar, Union, overload) s
+27.6 683 M (7:) s
+43.8 683 M
+(import warnings) s
+27.6 673 M (8:) s
+27.6 663 M (9:) s
+43.8 663 M
+(import torch) s
+22.2 653 M (10:) s
+43.8 653 M
+(from torch import Tensor, device, dtype, nn) s
+22.2 643 M (11:) s
+43.8 643 M
+(import torch.nn.functional as F) s
+22.2 633 M (12:) s
+22.2 623 M (13:) s
+43.8 623 M
+(import bitsandbytes as bnb) s
+22.2 613 M (14:) s
+43.8 613 M
+(from bitsandbytes.autograd._functions import get_tile_inds, undo_layout) s
+22.2 603 M (15:) s
+43.8 603 M
+(from bitsandbytes.functional import QuantState) s
+22.2 593 M (16:) s
+43.8 593 M
+(from bitsandbytes.optim import GlobalOptimManager) s
+22.2 583 M (17:) s
+43.8 583 M
+(from bitsandbytes.utils import \() s
+22.2 573 M (18:) s
+43.8 573 M
+(    INVERSE_LINEAR_8BIT_WEIGHTS_FORMAT_MAPPING,) s
+22.2 563 M (19:) s
+43.8 563 M
+(    LINEAR_8BIT_WEIGHTS_FORMAT_MAPPING,) s
+22.2 553 M (20:) s
+43.8 553 M
+(    OutlierTracer,) s
+22.2 543 M (21:) s
+43.8 543 M
+(\)) s
+22.2 533 M (22:) s
+22.2 523 M (23:) s
+43.8 523 M
+(T = TypeVar\("T", bound="torch.nn.Module"\)) s
+22.2 513 M (24:) s
+22.2 503 M (25:) s
+22.2 493 M (26:) s
+43.8 493 M
+(class StableEmbedding\(torch.nn.Embedding\):) s
+22.2 483 M (27:) s
+43.8 483 M
+(    """) s
+22.2 473 M (28:) s
+43.8 473 M
+(    Custom embedding layer designed to improve stability during training for NLP tasks by usin) s
+5 463 M
+(g 32-bit optimizer states. It is designed to reduce gradient variations that can result from quantiza) s
+5 453 M
+(tion. This embedding layer is initialized with Xavier uniform initialization followed by layer normal) s
+5 443 M
+(ization.) s
+22.2 433 M (29:) s
+22.2 423 M (30:) s
+43.8 423 M
+(    Example:) s
+22.2 413 M (31:) s
+22.2 403 M (32:) s
+43.8 403 M
+(    ```) s
+22.2 393 M (33:) s
+43.8 393 M
+(    # Initialize StableEmbedding layer with vocabulary size 1000, embedding dimension 300) s
+22.2 383 M (34:) s
+43.8 383 M
+(    embedding_layer = StableEmbedding\(num_embeddings=1000, embedding_dim=300\)) s
+22.2 373 M (35:) s
+22.2 363 M (36:) s
+43.8 363 M
+(    # Reset embedding parameters) s
+22.2 353 M (37:) s
+43.8 353 M
+(    embedding_layer.reset_parameters\(\)) s
+22.2 343 M (38:) s
+22.2 333 M (39:) s
+43.8 333 M
+(    # Perform a forward pass with input tensor) s
+22.2 323 M (40:) s
+43.8 323 M
+(    input_tensor = torch.tensor\([1, 2, 3]\)) s
+22.2 313 M (41:) s
+43.8 313 M
+(    output_embedding = embedding_layer\(input_tensor\)) s
+22.2 303 M (42:) s
+43.8 303 M
+(    ```) s
+22.2 293 M (43:) s
+22.2 283 M (44:) s
+43.8 283 M
+(    Attributes:) s
+22.2 273 M (45:) s
+43.8 273 M
+(        norm \(`torch.nn.LayerNorm`\): Layer normalization applied after the embedding.) s
+22.2 263 M (46:) s
+22.2 253 M (47:) s
+43.8 253 M
+(    Methods:) s
+22.2 243 M (48:) s
+43.8 243 M
+(        reset_parameters\(\): Reset embedding parameters using Xavier uniform initialization.) s
+22.2 233 M (49:) s
+43.8 233 M
+(        forward\(input: Tensor\) -> Tensor: Forward pass through the stable embedding layer.) s
+22.2 223 M (50:) s
+43.8 223 M
+(    """) s
+22.2 213 M (51:) s
+22.2 203 M (52:) s
+43.8 203 M
+(    def __init__\() s
+22.2 193 M (53:) s
+43.8 193 M
+(        self,) s
+22.2 183 M (54:) s
+43.8 183 M
+(        num_embeddings: int,) s
+22.2 173 M (55:) s
+43.8 173 M
+(        embedding_dim: int,) s
+22.2 163 M (56:) s
+43.8 163 M
+(        padding_idx: Optional[int] = None,) s
+22.2 153 M (57:) s
+43.8 153 M
+(        max_norm: Optional[float] = None,) s
+22.2 143 M (58:) s
+43.8 143 M
+(        norm_type: float = 2.0,) s
+22.2 133 M (59:) s
+43.8 133 M
+(        scale_grad_by_freq: bool = False,) s
+22.2 123 M (60:) s
+43.8 123 M
+(        sparse: bool = False,) s
+22.2 113 M (61:) s
+43.8 113 M
+(        _weight: Optional[Tensor] = None,) s
+22.2 103 M (62:) s
+43.8 103 M
+(        device=None,) s
+22.2 93 M (63:) s
+43.8 93 M
+(        dtype=None,) s
+22.2 83 M (64:) s
+43.8 83 M
+(    \) -> None:) s
+22.2 73 M (65:) s
+43.8 73 M
+(        """) s
+22.2 63 M (66:) s
+43.8 63 M
+(        Args:) s
+22.2 53 M (67:) s
+43.8 53 M
+(            num_embeddings \(`int`\):) s
+22.2 43 M (68:) s
+43.8 43 M
+(                The number of unique embeddings \(vocabulary size\).) s
+22.2 33 M (69:) s
+43.8 33 M
+(            embedding_dim \(`int`\):) s
+22.2 23 M (70:) s
+43.8 23 M
+(                The dimensionality of the embedding.) s
+22.2 13 M (71:) s
+43.8 13 M
+(            padding_idx \(`Optional[int]`\):) s
+22.2 3 M (72:) s
+43.8 3 M
+(                Pads the output with zeros at the given index.) s
+_R
+S
+%%Page: (2) 2
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 2 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (2) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+22.2 743 M (73:) s
+43.8 743 M
+(            max_norm \(`Optional[float]`\):) s
+22.2 733 M (74:) s
+43.8 733 M
+(                Renormalizes embeddings to have a maximum L2 norm.) s
+22.2 723 M (75:) s
+43.8 723 M
+(            norm_type \(`float`, defaults to `2.0`\):) s
+22.2 713 M (76:) s
+43.8 713 M
+(                The p-norm to compute for the `max_norm` option.) s
+22.2 703 M (77:) s
+43.8 703 M
+(            scale_grad_by_freq \(`bool`, defaults to `False`\):) s
+22.2 693 M (78:) s
+43.8 693 M
+(                Scale gradient by frequency during backpropagation.) s
+22.2 683 M (79:) s
+43.8 683 M
+(            sparse \(`bool`, defaults to `False`\):) s
+22.2 673 M (80:) s
+43.8 673 M
+(                Computes dense gradients. Set to `True` to compute sparse gradients instead.) s
+22.2 663 M (81:) s
+43.8 663 M
+(            _weight \(`Optional[Tensor]`\):) s
+22.2 653 M (82:) s
+43.8 653 M
+(                Pretrained embeddings.) s
+22.2 643 M (83:) s
+43.8 643 M
+(        """) s
+22.2 633 M (84:) s
+43.8 633 M
+(        super\(\).__init__\() s
+22.2 623 M (85:) s
+43.8 623 M
+(            num_embeddings,) s
+22.2 613 M (86:) s
+43.8 613 M
+(            embedding_dim,) s
+22.2 603 M (87:) s
+43.8 603 M
+(            padding_idx,) s
+22.2 593 M (88:) s
+43.8 593 M
+(            max_norm,) s
+22.2 583 M (89:) s
+43.8 583 M
+(            norm_type,) s
+22.2 573 M (90:) s
+43.8 573 M
+(            scale_grad_by_freq,) s
+22.2 563 M (91:) s
+43.8 563 M
+(            sparse,) s
+22.2 553 M (92:) s
+43.8 553 M
+(            _weight,) s
+22.2 543 M (93:) s
+43.8 543 M
+(            device,) s
+22.2 533 M (94:) s
+43.8 533 M
+(            dtype,) s
+22.2 523 M (95:) s
+43.8 523 M
+(        \)) s
+22.2 513 M (96:) s
+43.8 513 M
+(        self.norm = torch.nn.LayerNorm\(embedding_dim, device=device\)) s
+22.2 503 M (97:) s
+43.8 503 M
+(        GlobalOptimManager.get_instance\(\).register_module_override\(self, "weight", {"optim_bit) s
+5 493 M
+(s": 32}\)) s
+22.2 483 M (98:) s
+22.2 473 M (99:) s
+43.8 473 M
+(    def reset_parameters\(self\) -> None:) s
+16.8 463 M (100:) s
+43.8 463 M
+(        torch.nn.init.xavier_uniform_\(self.weight\)) s
+16.8 453 M (101:) s
+43.8 453 M
+(        self._fill_padding_idx_with_zero\(\)) s
+16.8 443 M (102:) s
+16.8 433 M (103:) s
+43.8 433 M
+(    """ !!! This is a redefinition of _fill_padding_idx_with_zero in torch.nn.Embedding) s
+16.8 423 M (104:) s
+43.8 423 M
+(        to make the Layer compatible with Pytorch < 1.9.) s
+16.8 413 M (105:) s
+43.8 413 M
+(        This means that if this changes in future PyTorch releases this need to change too) s
+16.8 403 M (106:) s
+43.8 403 M
+(        which is cumbersome. However, with this we can ensure compatibility with previous) s
+16.8 393 M (107:) s
+43.8 393 M
+(        PyTorch releases.) s
+16.8 383 M (108:) s
+43.8 383 M
+(    """) s
+16.8 373 M (109:) s
+16.8 363 M (110:) s
+43.8 363 M
+(    def _fill_padding_idx_with_zero\(self\) -> None:) s
+16.8 353 M (111:) s
+43.8 353 M
+(        if self.padding_idx is not None:) s
+16.8 343 M (112:) s
+43.8 343 M
+(            with torch.no_grad\(\):) s
+16.8 333 M (113:) s
+43.8 333 M
+(                self.weight[self.padding_idx].fill_\(0\)) s
+16.8 323 M (114:) s
+16.8 313 M (115:) s
+43.8 313 M
+(    def forward\(self, input: Tensor\) -> Tensor:) s
+16.8 303 M (116:) s
+43.8 303 M
+(        emb = F.embedding\() s
+16.8 293 M (117:) s
+43.8 293 M
+(            input,) s
+16.8 283 M (118:) s
+43.8 283 M
+(            self.weight,) s
+16.8 273 M (119:) s
+43.8 273 M
+(            self.padding_idx,) s
+16.8 263 M (120:) s
+43.8 263 M
+(            self.max_norm,) s
+16.8 253 M (121:) s
+43.8 253 M
+(            self.norm_type,) s
+16.8 243 M (122:) s
+43.8 243 M
+(            self.scale_grad_by_freq,) s
+16.8 233 M (123:) s
+43.8 233 M
+(            self.sparse,) s
+16.8 223 M (124:) s
+43.8 223 M
+(        \)) s
+16.8 213 M (125:) s
+16.8 203 M (126:) s
+43.8 203 M
+(        # always apply layer norm in full precision) s
+16.8 193 M (127:) s
+43.8 193 M
+(        emb = emb.to\(torch.get_default_dtype\(\)\)) s
+16.8 183 M (128:) s
+16.8 173 M (129:) s
+43.8 173 M
+(        return self.norm\(emb\).to\(self.weight.dtype\)) s
+16.8 163 M (130:) s
+16.8 153 M (131:) s
+16.8 143 M (132:) s
+43.8 143 M
+(class Embedding\(torch.nn.Embedding\):) s
+16.8 133 M (133:) s
+43.8 133 M
+(    """) s
+16.8 123 M (134:) s
+43.8 123 M
+(    Embedding class to store and retrieve word embeddings from their indices.) s
+16.8 113 M (135:) s
+43.8 113 M
+(    """) s
+16.8 103 M (136:) s
+16.8 93 M (137:) s
+43.8 93 M
+(    def __init__\() s
+16.8 83 M (138:) s
+43.8 83 M
+(        self,) s
+16.8 73 M (139:) s
+43.8 73 M
+(        num_embeddings: int,) s
+16.8 63 M (140:) s
+43.8 63 M
+(        embedding_dim: int,) s
+16.8 53 M (141:) s
+43.8 53 M
+(        padding_idx: Optional[int] = None,) s
+16.8 43 M (142:) s
+43.8 43 M
+(        max_norm: Optional[float] = None,) s
+16.8 33 M (143:) s
+43.8 33 M
+(        norm_type: float = 2.0,) s
+16.8 23 M (144:) s
+43.8 23 M
+(        scale_grad_by_freq: bool = False,) s
+16.8 13 M (145:) s
+43.8 13 M
+(        sparse: bool = False,) s
+16.8 3 M (146:) s
+43.8 3 M
+(        _weight: Optional[Tensor] = None,) s
+_R
+S
+%%Page: (3) 3
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 3 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (3) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (147:) s
+43.8 743 M
+(        device: Optional[device] = None,) s
+16.8 733 M (148:) s
+43.8 733 M
+(    \) -> None:) s
+16.8 723 M (149:) s
+43.8 723 M
+(        """) s
+16.8 713 M (150:) s
+43.8 713 M
+(        Args:) s
+16.8 703 M (151:) s
+43.8 703 M
+(            num_embeddings \(`int`\):) s
+16.8 693 M (152:) s
+43.8 693 M
+(                The number of unique embeddings \(vocabulary size\).) s
+16.8 683 M (153:) s
+43.8 683 M
+(            embedding_dim \(`int`\):) s
+16.8 673 M (154:) s
+43.8 673 M
+(                The dimensionality of the embedding.) s
+16.8 663 M (155:) s
+43.8 663 M
+(            padding_idx \(`Optional[int]`\):) s
+16.8 653 M (156:) s
+43.8 653 M
+(                Pads the output with zeros at the given index.) s
+16.8 643 M (157:) s
+43.8 643 M
+(            max_norm \(`Optional[float]`\):) s
+16.8 633 M (158:) s
+43.8 633 M
+(                Renormalizes embeddings to have a maximum L2 norm.) s
+16.8 623 M (159:) s
+43.8 623 M
+(            norm_type \(`float`, defaults to `2.0`\):) s
+16.8 613 M (160:) s
+43.8 613 M
+(                The p-norm to compute for the `max_norm` option.) s
+16.8 603 M (161:) s
+43.8 603 M
+(            scale_grad_by_freq \(`bool`, defaults to `False`\):) s
+16.8 593 M (162:) s
+43.8 593 M
+(                Scale gradient by frequency during backpropagation.) s
+16.8 583 M (163:) s
+43.8 583 M
+(            sparse \(`bool`, defaults to `False`\):) s
+16.8 573 M (164:) s
+43.8 573 M
+(                Computes dense gradients. Set to `True` to compute sparse gradients instead.) s
+16.8 563 M (165:) s
+43.8 563 M
+(            _weight \(`Optional[Tensor]`\):) s
+16.8 553 M (166:) s
+43.8 553 M
+(                Pretrained embeddings.) s
+16.8 543 M (167:) s
+43.8 543 M
+(        """) s
+16.8 533 M (168:) s
+43.8 533 M
+(        super\(\).__init__\() s
+16.8 523 M (169:) s
+43.8 523 M
+(            num_embeddings,) s
+16.8 513 M (170:) s
+43.8 513 M
+(            embedding_dim,) s
+16.8 503 M (171:) s
+43.8 503 M
+(            padding_idx,) s
+16.8 493 M (172:) s
+43.8 493 M
+(            max_norm,) s
+16.8 483 M (173:) s
+43.8 483 M
+(            norm_type,) s
+16.8 473 M (174:) s
+43.8 473 M
+(            scale_grad_by_freq,) s
+16.8 463 M (175:) s
+43.8 463 M
+(            sparse,) s
+16.8 453 M (176:) s
+43.8 453 M
+(            _weight,) s
+16.8 443 M (177:) s
+43.8 443 M
+(            device=device,) s
+16.8 433 M (178:) s
+43.8 433 M
+(        \)) s
+16.8 423 M (179:) s
+43.8 423 M
+(        GlobalOptimManager.get_instance\(\).register_module_override\(self, "weight", {"optim_bit) s
+5 413 M
+(s": 32}\)) s
+16.8 403 M (180:) s
+16.8 393 M (181:) s
+43.8 393 M
+(    def reset_parameters\(self\) -> None:) s
+16.8 383 M (182:) s
+43.8 383 M
+(        torch.nn.init.xavier_uniform_\(self.weight\)) s
+16.8 373 M (183:) s
+43.8 373 M
+(        self._fill_padding_idx_with_zero\(\)) s
+16.8 363 M (184:) s
+16.8 353 M (185:) s
+43.8 353 M
+(    """ !!! This is a redefinition of _fill_padding_idx_with_zero in torch.nn.Embedding) s
+16.8 343 M (186:) s
+43.8 343 M
+(        to make the Layer compatible with Pytorch < 1.9.) s
+16.8 333 M (187:) s
+43.8 333 M
+(        This means that if this changes in future PyTorch releases this need to change too) s
+16.8 323 M (188:) s
+43.8 323 M
+(        which is cumbersome. However, with this we can ensure compatibility with previous) s
+16.8 313 M (189:) s
+43.8 313 M
+(        PyTorch releases.) s
+16.8 303 M (190:) s
+43.8 303 M
+(    """) s
+16.8 293 M (191:) s
+16.8 283 M (192:) s
+43.8 283 M
+(    def _fill_padding_idx_with_zero\(self\) -> None:) s
+16.8 273 M (193:) s
+43.8 273 M
+(        if self.padding_idx is not None:) s
+16.8 263 M (194:) s
+43.8 263 M
+(            with torch.no_grad\(\):) s
+16.8 253 M (195:) s
+43.8 253 M
+(                self.weight[self.padding_idx].fill_\(0\)) s
+16.8 243 M (196:) s
+16.8 233 M (197:) s
+43.8 233 M
+(    def forward\(self, input: Tensor\) -> Tensor:) s
+16.8 223 M (198:) s
+43.8 223 M
+(        emb = F.embedding\() s
+16.8 213 M (199:) s
+43.8 213 M
+(            input,) s
+16.8 203 M (200:) s
+43.8 203 M
+(            self.weight,) s
+16.8 193 M (201:) s
+43.8 193 M
+(            self.padding_idx,) s
+16.8 183 M (202:) s
+43.8 183 M
+(            self.max_norm,) s
+16.8 173 M (203:) s
+43.8 173 M
+(            self.norm_type,) s
+16.8 163 M (204:) s
+43.8 163 M
+(            self.scale_grad_by_freq,) s
+16.8 153 M (205:) s
+43.8 153 M
+(            self.sparse,) s
+16.8 143 M (206:) s
+43.8 143 M
+(        \)) s
+16.8 133 M (207:) s
+16.8 123 M (208:) s
+43.8 123 M
+(        return emb) s
+16.8 113 M (209:) s
+16.8 103 M (210:) s
+16.8 93 M (211:) s
+43.8 93 M
+(class Params4bit\(torch.nn.Parameter\):) s
+16.8 83 M (212:) s
+43.8 83 M
+(    def __new__\() s
+16.8 73 M (213:) s
+43.8 73 M
+(        cls,) s
+16.8 63 M (214:) s
+43.8 63 M
+(        data: Optional[torch.Tensor] = None,) s
+16.8 53 M (215:) s
+43.8 53 M
+(        requires_grad=False,  # quantized weights should be frozen by default) s
+16.8 43 M (216:) s
+43.8 43 M
+(        quant_state: Optional[QuantState] = None,) s
+16.8 33 M (217:) s
+43.8 33 M
+(        blocksize: int = 64,) s
+16.8 23 M (218:) s
+43.8 23 M
+(        compress_statistics: bool = True,) s
+16.8 13 M (219:) s
+43.8 13 M
+(        quant_type: str = "fp4",) s
+16.8 3 M (220:) s
+43.8 3 M
+(        quant_storage: torch.dtype = torch.uint8,) s
+_R
+S
+%%Page: (4) 4
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 4 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (4) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (221:) s
+43.8 743 M
+(        module: Optional["Linear4bit"] = None,) s
+16.8 733 M (222:) s
+43.8 733 M
+(        bnb_quantized: bool = False,) s
+16.8 723 M (223:) s
+43.8 723 M
+(    \) -> "Params4bit":) s
+16.8 713 M (224:) s
+43.8 713 M
+(        if data is None:) s
+16.8 703 M (225:) s
+43.8 703 M
+(            data = torch.empty\(0\)) s
+16.8 693 M (226:) s
+16.8 683 M (227:) s
+43.8 683 M
+(        self = torch.Tensor._make_subclass\(cls, data, requires_grad\)) s
+16.8 673 M (228:) s
+43.8 673 M
+(        self.blocksize = blocksize) s
+16.8 663 M (229:) s
+43.8 663 M
+(        self.compress_statistics = compress_statistics) s
+16.8 653 M (230:) s
+43.8 653 M
+(        self.quant_type = quant_type) s
+16.8 643 M (231:) s
+43.8 643 M
+(        self.quant_state = quant_state) s
+16.8 633 M (232:) s
+43.8 633 M
+(        self.quant_storage = quant_storage) s
+16.8 623 M (233:) s
+43.8 623 M
+(        self.bnb_quantized = bnb_quantized) s
+16.8 613 M (234:) s
+43.8 613 M
+(        self.data = data) s
+16.8 603 M (235:) s
+43.8 603 M
+(        self.module = module) s
+16.8 593 M (236:) s
+43.8 593 M
+(        return self) s
+16.8 583 M (237:) s
+16.8 573 M (238:) s
+43.8 573 M
+(    def __getstate__\(self\):) s
+16.8 563 M (239:) s
+43.8 563 M
+(        state = self.__dict__.copy\(\)) s
+16.8 553 M (240:) s
+43.8 553 M
+(        state["data"] = self.data) s
+16.8 543 M (241:) s
+43.8 543 M
+(        state["requires_grad"] = self.requires_grad) s
+16.8 533 M (242:) s
+43.8 533 M
+(        return state) s
+16.8 523 M (243:) s
+16.8 513 M (244:) s
+43.8 513 M
+(    def __setstate__\(self, state\):) s
+16.8 503 M (245:) s
+43.8 503 M
+(        self.requires_grad = state["requires_grad"]) s
+16.8 493 M (246:) s
+43.8 493 M
+(        self.blocksize = state["blocksize"]) s
+16.8 483 M (247:) s
+43.8 483 M
+(        self.compress_statistics = state["compress_statistics"]) s
+16.8 473 M (248:) s
+43.8 473 M
+(        self.quant_type = state["quant_type"]) s
+16.8 463 M (249:) s
+43.8 463 M
+(        self.quant_state = state["quant_state"]) s
+16.8 453 M (250:) s
+43.8 453 M
+(        self.data = state["data"]) s
+16.8 443 M (251:) s
+43.8 443 M
+(        self.quant_storage = state["quant_storage"]) s
+16.8 433 M (252:) s
+43.8 433 M
+(        self.bnb_quantized = state["bnb_quantized"]) s
+16.8 423 M (253:) s
+43.8 423 M
+(        self.module = state["module"]) s
+16.8 413 M (254:) s
+16.8 403 M (255:) s
+43.8 403 M
+(    def __deepcopy__\(self, memo\):) s
+16.8 393 M (256:) s
+43.8 393 M
+(        new_instance = type\(self\).__new__\(type\(self\)\)) s
+16.8 383 M (257:) s
+43.8 383 M
+(        state = self.__getstate__\(\)) s
+16.8 373 M (258:) s
+43.8 373 M
+(        new_instance.__setstate__\(state\)) s
+16.8 363 M (259:) s
+43.8 363 M
+(        new_instance.quant_state = copy.deepcopy\(state["quant_state"]\)) s
+16.8 353 M (260:) s
+43.8 353 M
+(        new_instance.data = copy.deepcopy\(state["data"]\)) s
+16.8 343 M (261:) s
+43.8 343 M
+(        return new_instance) s
+16.8 333 M (262:) s
+16.8 323 M (263:) s
+43.8 323 M
+(    def __copy__\(self\):) s
+16.8 313 M (264:) s
+43.8 313 M
+(        new_instance = type\(self\).__new__\(type\(self\)\)) s
+16.8 303 M (265:) s
+43.8 303 M
+(        state = self.__getstate__\(\)) s
+16.8 293 M (266:) s
+43.8 293 M
+(        new_instance.__setstate__\(state\)) s
+16.8 283 M (267:) s
+43.8 283 M
+(        return new_instance) s
+16.8 273 M (268:) s
+16.8 263 M (269:) s
+43.8 263 M
+(    @classmethod) s
+16.8 253 M (270:) s
+43.8 253 M
+(    def from_prequantized\() s
+16.8 243 M (271:) s
+43.8 243 M
+(        cls,) s
+16.8 233 M (272:) s
+43.8 233 M
+(        data: torch.Tensor,) s
+16.8 223 M (273:) s
+43.8 223 M
+(        quantized_stats: Dict[str, Any],) s
+16.8 213 M (274:) s
+43.8 213 M
+(        requires_grad: bool = False,) s
+16.8 203 M (275:) s
+43.8 203 M
+(        device="cuda",) s
+16.8 193 M (276:) s
+43.8 193 M
+(        **kwargs,) s
+16.8 183 M (277:) s
+43.8 183 M
+(    \) -> "Params4bit":) s
+16.8 173 M (278:) s
+43.8 173 M
+(        self = torch.Tensor._make_subclass\(cls, data.to\(device\)\)) s
+16.8 163 M (279:) s
+43.8 163 M
+(        self.requires_grad = requires_grad) s
+16.8 153 M (280:) s
+43.8 153 M
+(        self.quant_state = QuantState.from_dict\(qs_dict=quantized_stats, device=device\)) s
+16.8 143 M (281:) s
+43.8 143 M
+(        self.blocksize = self.quant_state.blocksize) s
+16.8 133 M (282:) s
+43.8 133 M
+(        self.compress_statistics = self.quant_state.nested) s
+16.8 123 M (283:) s
+43.8 123 M
+(        self.quant_type = self.quant_state.quant_type) s
+16.8 113 M (284:) s
+43.8 113 M
+(        self.bnb_quantized = True) s
+16.8 103 M (285:) s
+43.8 103 M
+(        return self) s
+16.8 93 M (286:) s
+16.8 83 M (287:) s
+43.8 83 M
+(    def _quantize\(self, device\):) s
+16.8 73 M (288:) s
+43.8 73 M
+(        w = self.data.contiguous\(\).cuda\(device\)) s
+16.8 63 M (289:) s
+43.8 63 M
+(        w_4bit, quant_state = bnb.functional.quantize_4bit\() s
+16.8 53 M (290:) s
+43.8 53 M
+(            w,) s
+16.8 43 M (291:) s
+43.8 43 M
+(            blocksize=self.blocksize,) s
+16.8 33 M (292:) s
+43.8 33 M
+(            compress_statistics=self.compress_statistics,) s
+16.8 23 M (293:) s
+43.8 23 M
+(            quant_type=self.quant_type,) s
+16.8 13 M (294:) s
+43.8 13 M
+(            quant_storage=self.quant_storage,) s
+16.8 3 M (295:) s
+43.8 3 M
+(        \)) s
+_R
+S
+%%Page: (5) 5
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 5 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (5) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (296:) s
+43.8 743 M
+(        self.data = w_4bit) s
+16.8 733 M (297:) s
+43.8 733 M
+(        self.quant_state = quant_state) s
+16.8 723 M (298:) s
+43.8 723 M
+(        if self.module is not None:) s
+16.8 713 M (299:) s
+43.8 713 M
+(            self.module.quant_state = quant_state) s
+16.8 703 M (300:) s
+43.8 703 M
+(        self.bnb_quantized = True) s
+16.8 693 M (301:) s
+43.8 693 M
+(        return self) s
+16.8 683 M (302:) s
+16.8 673 M (303:) s
+43.8 673 M
+(    def cuda\(self, device: Optional[Union[int, device, str]] = None, non_blocking: bool = Fals) s
+5 663 M
+(e\):) s
+16.8 653 M (304:) s
+43.8 653 M
+(        return self.to\(device="cuda" if device is None else device, non_blocking=non_blocking\)) s
+16.8 643 M (305:) s
+16.8 633 M (306:) s
+43.8 633 M
+(    @overload) s
+16.8 623 M (307:) s
+43.8 623 M
+(    def to\() s
+16.8 613 M (308:) s
+43.8 613 M
+(        self: T,) s
+16.8 603 M (309:) s
+43.8 603 M
+(        device: Optional[Union[int, device]] = ...,) s
+16.8 593 M (310:) s
+43.8 593 M
+(        dtype: Optional[Union[dtype, str]] = ...,) s
+16.8 583 M (311:) s
+43.8 583 M
+(        non_blocking: bool = ...,) s
+16.8 573 M (312:) s
+43.8 573 M
+(    \) -> T: ...) s
+16.8 563 M (313:) s
+16.8 553 M (314:) s
+43.8 553 M
+(    @overload) s
+16.8 543 M (315:) s
+43.8 543 M
+(    def to\(self: T, dtype: Union[dtype, str], non_blocking: bool = ...\) -> T: ...) s
+16.8 533 M (316:) s
+16.8 523 M (317:) s
+43.8 523 M
+(    @overload) s
+16.8 513 M (318:) s
+43.8 513 M
+(    def to\(self: T, tensor: Tensor, non_blocking: bool = ...\) -> T: ...) s
+16.8 503 M (319:) s
+16.8 493 M (320:) s
+43.8 493 M
+(    def to\(self, *args, **kwargs\):) s
+16.8 483 M (321:) s
+43.8 483 M
+(        device, dtype, non_blocking, convert_to_format = torch._C._nn._parse_to\(*args, **kwarg) s
+5 473 M
+(s\)) s
+16.8 463 M (322:) s
+16.8 453 M (323:) s
+43.8 453 M
+(        if device is not None and device.type == "cuda" and not self.bnb_quantized:) s
+16.8 443 M (324:) s
+43.8 443 M
+(            return self._quantize\(device\)) s
+16.8 433 M (325:) s
+43.8 433 M
+(        else:) s
+16.8 423 M (326:) s
+43.8 423 M
+(            if self.quant_state is not None:) s
+16.8 413 M (327:) s
+43.8 413 M
+(                self.quant_state.to\(device\)) s
+16.8 403 M (328:) s
+16.8 393 M (329:) s
+43.8 393 M
+(            new_param = Params4bit\() s
+16.8 383 M (330:) s
+43.8 383 M
+(                super\(\).to\(device=device, dtype=dtype, non_blocking=non_blocking\),) s
+16.8 373 M (331:) s
+43.8 373 M
+(                requires_grad=self.requires_grad,) s
+16.8 363 M (332:) s
+43.8 363 M
+(                quant_state=self.quant_state,) s
+16.8 353 M (333:) s
+43.8 353 M
+(                blocksize=self.blocksize,) s
+16.8 343 M (334:) s
+43.8 343 M
+(                compress_statistics=self.compress_statistics,) s
+16.8 333 M (335:) s
+43.8 333 M
+(                quant_type=self.quant_type,) s
+16.8 323 M (336:) s
+43.8 323 M
+(            \)) s
+16.8 313 M (337:) s
+16.8 303 M (338:) s
+43.8 303 M
+(            return new_param) s
+16.8 293 M (339:) s
+16.8 283 M (340:) s
+16.8 273 M (341:) s
+43.8 273 M
+(class Linear4bit\(nn.Linear\):) s
+16.8 263 M (342:) s
+43.8 263 M
+(    """) s
+16.8 253 M (343:) s
+43.8 253 M
+(    This class is the base module for the 4-bit quantization algorithm presented in [QLoRA]\(ht) s
+5 243 M
+(tps://arxiv.org/abs/2305.14314\).) s
+16.8 233 M (344:) s
+43.8 233 M
+(    QLoRA 4-bit linear layers uses blockwise k-bit quantization under the hood, with the possi) s
+5 223 M
+(bility of selecting various) s
+16.8 213 M (345:) s
+43.8 213 M
+(    compute datatypes such as FP4 and NF4.) s
+16.8 203 M (346:) s
+16.8 193 M (347:) s
+43.8 193 M
+(    In order to quantize a linear layer one should first load the original fp16 / bf16 weights) s
+5 183 M
+( into) s
+16.8 173 M (348:) s
+43.8 173 M
+(    the Linear4bit module, then call `quantized_module.to\("cuda"\)` to quantize the fp16 / bf16) s
+5 163 M
+( weights.) s
+16.8 153 M (349:) s
+16.8 143 M (350:) s
+43.8 143 M
+(    Example:) s
+16.8 133 M (351:) s
+16.8 123 M (352:) s
+43.8 123 M
+(    ```python) s
+16.8 113 M (353:) s
+43.8 113 M
+(    import torch) s
+16.8 103 M (354:) s
+43.8 103 M
+(    import torch.nn as nn) s
+16.8 93 M (355:) s
+16.8 83 M (356:) s
+43.8 83 M
+(    import bitsandbytes as bnb) s
+16.8 73 M (357:) s
+43.8 73 M
+(    from bnb.nn import Linear4bit) s
+16.8 63 M (358:) s
+16.8 53 M (359:) s
+43.8 53 M
+(    fp16_model = nn.Sequential\() s
+16.8 43 M (360:) s
+43.8 43 M
+(        nn.Linear\(64, 64\),) s
+16.8 33 M (361:) s
+43.8 33 M
+(        nn.Linear\(64, 64\)) s
+16.8 23 M (362:) s
+43.8 23 M
+(    \)) s
+16.8 13 M (363:) s
+16.8 3 M (364:) s
+43.8 3 M
+(    quantized_model = nn.Sequential\() s
+_R
+S
+%%Page: (6) 6
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 6 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (6) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (365:) s
+43.8 743 M
+(        Linear4bit\(64, 64\),) s
+16.8 733 M (366:) s
+43.8 733 M
+(        Linear4bit\(64, 64\)) s
+16.8 723 M (367:) s
+43.8 723 M
+(    \)) s
+16.8 713 M (368:) s
+16.8 703 M (369:) s
+43.8 703 M
+(    quantized_model.load_state_dict\(fp16_model.state_dict\(\)\)) s
+16.8 693 M (370:) s
+43.8 693 M
+(    quantized_model = quantized_model.to\(0\) # Quantization happens here) s
+16.8 683 M (371:) s
+43.8 683 M
+(    ```) s
+16.8 673 M (372:) s
+43.8 673 M
+(    """) s
+16.8 663 M (373:) s
+16.8 653 M (374:) s
+43.8 653 M
+(    def __init__\() s
+16.8 643 M (375:) s
+43.8 643 M
+(        self,) s
+16.8 633 M (376:) s
+43.8 633 M
+(        input_features,) s
+16.8 623 M (377:) s
+43.8 623 M
+(        output_features,) s
+16.8 613 M (378:) s
+43.8 613 M
+(        bias=True,) s
+16.8 603 M (379:) s
+43.8 603 M
+(        compute_dtype=None,) s
+16.8 593 M (380:) s
+43.8 593 M
+(        compress_statistics=True,) s
+16.8 583 M (381:) s
+43.8 583 M
+(        quant_type="fp4",) s
+16.8 573 M (382:) s
+43.8 573 M
+(        quant_storage=torch.uint8,) s
+16.8 563 M (383:) s
+43.8 563 M
+(        device=None,) s
+16.8 553 M (384:) s
+43.8 553 M
+(    \):) s
+16.8 543 M (385:) s
+43.8 543 M
+(        """) s
+16.8 533 M (386:) s
+43.8 533 M
+(        Initialize Linear4bit class.) s
+16.8 523 M (387:) s
+16.8 513 M (388:) s
+43.8 513 M
+(        Args:) s
+16.8 503 M (389:) s
+43.8 503 M
+(            input_features \(`str`\):) s
+16.8 493 M (390:) s
+43.8 493 M
+(                Number of input features of the linear layer.) s
+16.8 483 M (391:) s
+43.8 483 M
+(            output_features \(`str`\):) s
+16.8 473 M (392:) s
+43.8 473 M
+(                Number of output features of the linear layer.) s
+16.8 463 M (393:) s
+43.8 463 M
+(            bias \(`bool`, defaults to `True`\):) s
+16.8 453 M (394:) s
+43.8 453 M
+(                Whether the linear class uses the bias term as well.) s
+16.8 443 M (395:) s
+43.8 443 M
+(        """) s
+16.8 433 M (396:) s
+43.8 433 M
+(        super\(\).__init__\(input_features, output_features, bias, device\)) s
+16.8 423 M (397:) s
+43.8 423 M
+(        self.weight = Params4bit\() s
+16.8 413 M (398:) s
+43.8 413 M
+(            self.weight.data,) s
+16.8 403 M (399:) s
+43.8 403 M
+(            requires_grad=False,) s
+16.8 393 M (400:) s
+43.8 393 M
+(            compress_statistics=compress_statistics,) s
+16.8 383 M (401:) s
+43.8 383 M
+(            quant_type=quant_type,) s
+16.8 373 M (402:) s
+43.8 373 M
+(            quant_storage=quant_storage,) s
+16.8 363 M (403:) s
+43.8 363 M
+(            module=self,) s
+16.8 353 M (404:) s
+43.8 353 M
+(        \)) s
+16.8 343 M (405:) s
+43.8 343 M
+(        # self.persistent_buffers = []  # TODO consider as way to save quant state) s
+16.8 333 M (406:) s
+43.8 333 M
+(        self.compute_dtype = compute_dtype) s
+16.8 323 M (407:) s
+43.8 323 M
+(        self.compute_type_is_set = False) s
+16.8 313 M (408:) s
+43.8 313 M
+(        self.quant_state = None) s
+16.8 303 M (409:) s
+43.8 303 M
+(        self.quant_storage = quant_storage) s
+16.8 293 M (410:) s
+16.8 283 M (411:) s
+43.8 283 M
+(    def set_compute_type\(self, x\):) s
+16.8 273 M (412:) s
+43.8 273 M
+(        if x.dtype in [torch.float32, torch.bfloat16]:) s
+16.8 263 M (413:) s
+43.8 263 M
+(            # the input is in a dtype that is safe to compute in, we switch) s
+16.8 253 M (414:) s
+43.8 253 M
+(            # to this type for speed and stability) s
+16.8 243 M (415:) s
+43.8 243 M
+(            self.compute_dtype = x.dtype) s
+16.8 233 M (416:) s
+43.8 233 M
+(        elif x.dtype == torch.float16:) s
+16.8 223 M (417:) s
+43.8 223 M
+(            # we take the compoute dtype passed into the layer) s
+16.8 213 M (418:) s
+43.8 213 M
+(            if self.compute_dtype == torch.float32 and \(x.numel\(\) == x.shape[-1]\):) s
+16.8 203 M (419:) s
+43.8 203 M
+(                # single batch inference with input torch.float16 and compute_dtype float32 ->) s
+5 193 M
+( slow inference when it could be fast) s
+16.8 183 M (420:) s
+43.8 183 M
+(                # warn the user about this) s
+16.8 173 M (421:) s
+43.8 173 M
+(                warnings.warn\() s
+16.8 163 M (422:) s
+43.8 163 M
+(                    "Input type into Linear4bit is torch.float16, but bnb_4bit_compute_dtype=t) s
+5 153 M
+(orch.float32 \(default\). This will lead to slow inference.",) s
+16.8 143 M (423:) s
+43.8 143 M
+(                \)) s
+16.8 133 M (424:) s
+43.8 133 M
+(                warnings.filterwarnings\("ignore", message=".*inference."\)) s
+16.8 123 M (425:) s
+43.8 123 M
+(            if self.compute_dtype == torch.float32 and \(x.numel\(\) != x.shape[-1]\):) s
+16.8 113 M (426:) s
+43.8 113 M
+(                warnings.warn\() s
+16.8 103 M (427:) s
+43.8 103 M
+(                    "Input type into Linear4bit is torch.float16, but bnb_4bit_compute_dtype=t) s
+5 93 M
+(orch.float32 \(default\). This will lead to slow inference or training speed.",) s
+16.8 83 M (428:) s
+43.8 83 M
+(                \)) s
+16.8 73 M (429:) s
+43.8 73 M
+(                warnings.filterwarnings\("ignore", message=".*inference or training"\)) s
+16.8 63 M (430:) s
+16.8 53 M (431:) s
+43.8 53 M
+(    def _save_to_state_dict\(self, destination, prefix, keep_vars\):) s
+16.8 43 M (432:) s
+43.8 43 M
+(        """) s
+16.8 33 M (433:) s
+43.8 33 M
+(        save weight and bias,) s
+16.8 23 M (434:) s
+43.8 23 M
+(        then fill state_dict with components of quant_state) s
+16.8 13 M (435:) s
+43.8 13 M
+(        """) s
+16.8 3 M (436:) s
+43.8 3 M
+(        super\(\)._save_to_state_dict\(destination, prefix, keep_vars\)  # saving weight and bias) s
+_R
+S
+%%Page: (7) 7
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 7 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (7) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (437:) s
+16.8 733 M (438:) s
+43.8 733 M
+(        if getattr\(self.weight, "quant_state", None\) is not None:) s
+16.8 723 M (439:) s
+43.8 723 M
+(            for k, v in self.weight.quant_state.as_dict\(packed=True\).items\(\):) s
+16.8 713 M (440:) s
+43.8 713 M
+(                destination[prefix + "weight." + k] = v if keep_vars else v.detach\(\)) s
+16.8 703 M (441:) s
+16.8 693 M (442:) s
+43.8 693 M
+(    def forward\(self, x: torch.Tensor\):) s
+16.8 683 M (443:) s
+43.8 683 M
+(        # weights are cast automatically as Int8Params, but the bias has to be cast manually) s
+16.8 673 M (444:) s
+43.8 673 M
+(        if self.bias is not None and self.bias.dtype != x.dtype:) s
+16.8 663 M (445:) s
+43.8 663 M
+(            self.bias.data = self.bias.data.to\(x.dtype\)) s
+16.8 653 M (446:) s
+16.8 643 M (447:) s
+43.8 643 M
+(        if getattr\(self.weight, "quant_state", None\) is None:) s
+16.8 633 M (448:) s
+43.8 633 M
+(            if getattr\(self, "quant_state", None\) is not None:) s
+16.8 623 M (449:) s
+43.8 623 M
+(                # the quant state got lost when the parameter got converted. This happens for ) s
+5 613 M
+(example for fsdp) s
+16.8 603 M (450:) s
+43.8 603 M
+(                # since we registered the module, we can recover the state here) s
+16.8 593 M (451:) s
+43.8 593 M
+(                assert self.weight.shape[1] == 1) s
+16.8 583 M (452:) s
+43.8 583 M
+(                if not isinstance\(self.weight, Params4bit\):) s
+16.8 573 M (453:) s
+43.8 573 M
+(                    self.weight = Params4bit\(self.weight, quant_storage=self.quant_storage\)) s
+16.8 563 M (454:) s
+43.8 563 M
+(                self.weight.quant_state = self.quant_state) s
+16.8 553 M (455:) s
+43.8 553 M
+(            else:) s
+16.8 543 M (456:) s
+43.8 543 M
+(                print\() s
+16.8 533 M (457:) s
+43.8 533 M
+(                    "FP4 quantization state not initialized. Please call .cuda\(\) or .to\(device) s
+5 523 M
+(\) on the LinearFP4 layer first.",) s
+16.8 513 M (458:) s
+43.8 513 M
+(                \)) s
+16.8 503 M (459:) s
+43.8 503 M
+(        if not self.compute_type_is_set:) s
+16.8 493 M (460:) s
+43.8 493 M
+(            self.set_compute_type\(x\)) s
+16.8 483 M (461:) s
+43.8 483 M
+(            self.compute_type_is_set = True) s
+16.8 473 M (462:) s
+16.8 463 M (463:) s
+43.8 463 M
+(        inp_dtype = x.dtype) s
+16.8 453 M (464:) s
+43.8 453 M
+(        if self.compute_dtype is not None:) s
+16.8 443 M (465:) s
+43.8 443 M
+(            x = x.to\(self.compute_dtype\)) s
+16.8 433 M (466:) s
+16.8 423 M (467:) s
+43.8 423 M
+(        bias = None if self.bias is None else self.bias.to\(self.compute_dtype\)) s
+16.8 413 M (468:) s
+43.8 413 M
+(        out = bnb.matmul_4bit\(x, self.weight.t\(\), bias=bias, quant_state=self.weight.quant_sta) s
+5 403 M
+(te\)) s
+16.8 393 M (469:) s
+16.8 383 M (470:) s
+43.8 383 M
+(        out = out.to\(inp_dtype\)) s
+16.8 373 M (471:) s
+16.8 363 M (472:) s
+43.8 363 M
+(        return out) s
+16.8 353 M (473:) s
+16.8 343 M (474:) s
+16.8 333 M (475:) s
+43.8 333 M
+(class LinearFP4\(Linear4bit\):) s
+16.8 323 M (476:) s
+43.8 323 M
+(    """) s
+16.8 313 M (477:) s
+43.8 313 M
+(    Implements the FP4 data type.) s
+16.8 303 M (478:) s
+43.8 303 M
+(    """) s
+16.8 293 M (479:) s
+16.8 283 M (480:) s
+43.8 283 M
+(    def __init__\() s
+16.8 273 M (481:) s
+43.8 273 M
+(        self,) s
+16.8 263 M (482:) s
+43.8 263 M
+(        input_features,) s
+16.8 253 M (483:) s
+43.8 253 M
+(        output_features,) s
+16.8 243 M (484:) s
+43.8 243 M
+(        bias=True,) s
+16.8 233 M (485:) s
+43.8 233 M
+(        compute_dtype=None,) s
+16.8 223 M (486:) s
+43.8 223 M
+(        compress_statistics=True,) s
+16.8 213 M (487:) s
+43.8 213 M
+(        quant_storage=torch.uint8,) s
+16.8 203 M (488:) s
+43.8 203 M
+(        device=None,) s
+16.8 193 M (489:) s
+43.8 193 M
+(    \):) s
+16.8 183 M (490:) s
+43.8 183 M
+(        """) s
+16.8 173 M (491:) s
+43.8 173 M
+(        Args:) s
+16.8 163 M (492:) s
+43.8 163 M
+(            input_features \(`str`\):) s
+16.8 153 M (493:) s
+43.8 153 M
+(                Number of input features of the linear layer.) s
+16.8 143 M (494:) s
+43.8 143 M
+(            output_features \(`str`\):) s
+16.8 133 M (495:) s
+43.8 133 M
+(                Number of output features of the linear layer.) s
+16.8 123 M (496:) s
+43.8 123 M
+(            bias \(`bool`, defaults to `True`\):) s
+16.8 113 M (497:) s
+43.8 113 M
+(                Whether the linear class uses the bias term as well.) s
+16.8 103 M (498:) s
+43.8 103 M
+(        """) s
+16.8 93 M (499:) s
+43.8 93 M
+(        super\(\).__init__\() s
+16.8 83 M (500:) s
+43.8 83 M
+(            input_features,) s
+16.8 73 M (501:) s
+43.8 73 M
+(            output_features,) s
+16.8 63 M (502:) s
+43.8 63 M
+(            bias,) s
+16.8 53 M (503:) s
+43.8 53 M
+(            compute_dtype,) s
+16.8 43 M (504:) s
+43.8 43 M
+(            compress_statistics,) s
+16.8 33 M (505:) s
+43.8 33 M
+(            "fp4",) s
+16.8 23 M (506:) s
+43.8 23 M
+(            quant_storage,) s
+16.8 13 M (507:) s
+43.8 13 M
+(            device,) s
+16.8 3 M (508:) s
+43.8 3 M
+(        \)) s
+_R
+S
+%%Page: (8) 8
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 8 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (8) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (509:) s
+16.8 733 M (510:) s
+16.8 723 M (511:) s
+43.8 723 M
+(class LinearNF4\(Linear4bit\):) s
+16.8 713 M (512:) s
+43.8 713 M
+(    """Implements the NF4 data type.) s
+16.8 703 M (513:) s
+16.8 693 M (514:) s
+43.8 693 M
+(    Constructs a quantization data type where each bin has equal area under a standard normal ) s
+5 683 M
+(distribution N\(0, 1\) that) s
+16.8 673 M (515:) s
+43.8 673 M
+(    is normalized into the range [-1, 1].) s
+16.8 663 M (516:) s
+16.8 653 M (517:) s
+43.8 653 M
+(    For more information read the paper: QLoRA: Efficient Finetuning of Quantized LLMs \(https:) s
+5 643 M
+(//arxiv.org/abs/2305.14314\)) s
+16.8 633 M (518:) s
+16.8 623 M (519:) s
+43.8 623 M
+(    Implementation of the NF4 data type in bitsandbytes can be found in the `create_normal_map) s
+5 613 M
+(` function in) s
+16.8 603 M (520:) s
+43.8 603 M
+(    the `functional.py` file: https://github.com/TimDettmers/bitsandbytes/blob/main/bitsandbyt) s
+5 593 M
+(es/functional.py#L236.) s
+16.8 583 M (521:) s
+43.8 583 M
+(    """) s
+16.8 573 M (522:) s
+16.8 563 M (523:) s
+43.8 563 M
+(    def __init__\() s
+16.8 553 M (524:) s
+43.8 553 M
+(        self,) s
+16.8 543 M (525:) s
+43.8 543 M
+(        input_features,) s
+16.8 533 M (526:) s
+43.8 533 M
+(        output_features,) s
+16.8 523 M (527:) s
+43.8 523 M
+(        bias=True,) s
+16.8 513 M (528:) s
+43.8 513 M
+(        compute_dtype=None,) s
+16.8 503 M (529:) s
+43.8 503 M
+(        compress_statistics=True,) s
+16.8 493 M (530:) s
+43.8 493 M
+(        quant_storage=torch.uint8,) s
+16.8 483 M (531:) s
+43.8 483 M
+(        device=None,) s
+16.8 473 M (532:) s
+43.8 473 M
+(    \):) s
+16.8 463 M (533:) s
+43.8 463 M
+(        """) s
+16.8 453 M (534:) s
+43.8 453 M
+(        Args:) s
+16.8 443 M (535:) s
+43.8 443 M
+(            input_features \(`str`\):) s
+16.8 433 M (536:) s
+43.8 433 M
+(                Number of input features of the linear layer.) s
+16.8 423 M (537:) s
+43.8 423 M
+(            output_features \(`str`\):) s
+16.8 413 M (538:) s
+43.8 413 M
+(                Number of output features of the linear layer.) s
+16.8 403 M (539:) s
+43.8 403 M
+(            bias \(`bool`, defaults to `True`\):) s
+16.8 393 M (540:) s
+43.8 393 M
+(                Whether the linear class uses the bias term as well.) s
+16.8 383 M (541:) s
+43.8 383 M
+(        """) s
+16.8 373 M (542:) s
+43.8 373 M
+(        super\(\).__init__\() s
+16.8 363 M (543:) s
+43.8 363 M
+(            input_features,) s
+16.8 353 M (544:) s
+43.8 353 M
+(            output_features,) s
+16.8 343 M (545:) s
+43.8 343 M
+(            bias,) s
+16.8 333 M (546:) s
+43.8 333 M
+(            compute_dtype,) s
+16.8 323 M (547:) s
+43.8 323 M
+(            compress_statistics,) s
+16.8 313 M (548:) s
+43.8 313 M
+(            "nf4",) s
+16.8 303 M (549:) s
+43.8 303 M
+(            quant_storage,) s
+16.8 293 M (550:) s
+43.8 293 M
+(            device,) s
+16.8 283 M (551:) s
+43.8 283 M
+(        \)) s
+16.8 273 M (552:) s
+16.8 263 M (553:) s
+16.8 253 M (554:) s
+43.8 253 M
+(class Int8Params\(torch.nn.Parameter\):) s
+16.8 243 M (555:) s
+43.8 243 M
+(    def __new__\() s
+16.8 233 M (556:) s
+43.8 233 M
+(        cls,) s
+16.8 223 M (557:) s
+43.8 223 M
+(        data=None,) s
+16.8 213 M (558:) s
+43.8 213 M
+(        requires_grad=True,) s
+16.8 203 M (559:) s
+43.8 203 M
+(        has_fp16_weights=False,) s
+16.8 193 M (560:) s
+43.8 193 M
+(        CB=None,) s
+16.8 183 M (561:) s
+43.8 183 M
+(        SCB=None,) s
+16.8 173 M (562:) s
+43.8 173 M
+(    \):) s
+16.8 163 M (563:) s
+43.8 163 M
+(        if data is None:) s
+16.8 153 M (564:) s
+43.8 153 M
+(            data = torch.empty\(0\)) s
+16.8 143 M (565:) s
+43.8 143 M
+(        obj = torch.Tensor._make_subclass\(cls, data, requires_grad\)) s
+16.8 133 M (566:) s
+43.8 133 M
+(        obj.CB = CB) s
+16.8 123 M (567:) s
+43.8 123 M
+(        obj.SCB = SCB) s
+16.8 113 M (568:) s
+43.8 113 M
+(        obj.has_fp16_weights = has_fp16_weights) s
+16.8 103 M (569:) s
+43.8 103 M
+(        return obj) s
+16.8 93 M (570:) s
+16.8 83 M (571:) s
+43.8 83 M
+(    def cuda\(self, device\):) s
+16.8 73 M (572:) s
+43.8 73 M
+(        if self.has_fp16_weights:) s
+16.8 63 M (573:) s
+43.8 63 M
+(            return super\(\).cuda\(device\)) s
+16.8 53 M (574:) s
+43.8 53 M
+(        else:) s
+16.8 43 M (575:) s
+43.8 43 M
+(            # we store the 8-bit rows-major weight) s
+16.8 33 M (576:) s
+43.8 33 M
+(            # we convert this weight to the turning/ampere weight during the first inference p) s
+5 23 M
+(ass) s
+16.8 13 M (577:) s
+43.8 13 M
+(            B = self.data.contiguous\(\).half\(\).cuda\(device\)) s
+16.8 3 M (578:) s
+43.8 3 M
+(            CB, CBt, SCB, SCBt, coo_tensorB = bnb.functional.double_quant\(B\)) s
+_R
+S
+%%Page: (9) 9
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 9 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (9) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (579:) s
+43.8 743 M
+(            del CBt) s
+16.8 733 M (580:) s
+43.8 733 M
+(            del SCBt) s
+16.8 723 M (581:) s
+43.8 723 M
+(            self.data = CB) s
+16.8 713 M (582:) s
+43.8 713 M
+(            self.CB = CB) s
+16.8 703 M (583:) s
+43.8 703 M
+(            self.SCB = SCB) s
+16.8 693 M (584:) s
+16.8 683 M (585:) s
+43.8 683 M
+(        return self) s
+16.8 673 M (586:) s
+16.8 663 M (587:) s
+43.8 663 M
+(    def __deepcopy__\(self, memo\):) s
+16.8 653 M (588:) s
+43.8 653 M
+(        # adjust this if new arguments are added to the constructor) s
+16.8 643 M (589:) s
+43.8 643 M
+(        new_instance = type\(self\).__new__\() s
+16.8 633 M (590:) s
+43.8 633 M
+(            type\(self\),) s
+16.8 623 M (591:) s
+43.8 623 M
+(            data=copy.deepcopy\(self.data, memo\),) s
+16.8 613 M (592:) s
+43.8 613 M
+(            requires_grad=self.requires_grad,) s
+16.8 603 M (593:) s
+43.8 603 M
+(            has_fp16_weights=self.has_fp16_weights,) s
+16.8 593 M (594:) s
+43.8 593 M
+(            CB=copy.deepcopy\(self.CB, memo\),) s
+16.8 583 M (595:) s
+43.8 583 M
+(            SCB=copy.deepcopy\(self.SCB, memo\),) s
+16.8 573 M (596:) s
+43.8 573 M
+(        \)) s
+16.8 563 M (597:) s
+43.8 563 M
+(        return new_instance) s
+16.8 553 M (598:) s
+16.8 543 M (599:) s
+43.8 543 M
+(    @overload) s
+16.8 533 M (600:) s
+43.8 533 M
+(    def to\() s
+16.8 523 M (601:) s
+43.8 523 M
+(        self: T,) s
+16.8 513 M (602:) s
+43.8 513 M
+(        device: Optional[Union[int, device]] = ...,) s
+16.8 503 M (603:) s
+43.8 503 M
+(        dtype: Optional[Union[dtype, str]] = ...,) s
+16.8 493 M (604:) s
+43.8 493 M
+(        non_blocking: bool = ...,) s
+16.8 483 M (605:) s
+43.8 483 M
+(    \) -> T: ...) s
+16.8 473 M (606:) s
+16.8 463 M (607:) s
+43.8 463 M
+(    @overload) s
+16.8 453 M (608:) s
+43.8 453 M
+(    def to\(self: T, dtype: Union[dtype, str], non_blocking: bool = ...\) -> T: ...) s
+16.8 443 M (609:) s
+16.8 433 M (610:) s
+43.8 433 M
+(    @overload) s
+16.8 423 M (611:) s
+43.8 423 M
+(    def to\(self: T, tensor: Tensor, non_blocking: bool = ...\) -> T: ...) s
+16.8 413 M (612:) s
+16.8 403 M (613:) s
+43.8 403 M
+(    def to\(self, *args, **kwargs\):) s
+16.8 393 M (614:) s
+43.8 393 M
+(        device, dtype, non_blocking, convert_to_format = torch._C._nn._parse_to\(*args, **kwarg) s
+5 383 M
+(s\)) s
+16.8 373 M (615:) s
+16.8 363 M (616:) s
+43.8 363 M
+(        if device is not None and device.type == "cuda" and self.data.device.type == "cpu":) s
+16.8 353 M (617:) s
+43.8 353 M
+(            return self.cuda\(device\)) s
+16.8 343 M (618:) s
+43.8 343 M
+(        else:) s
+16.8 333 M (619:) s
+43.8 333 M
+(            new_param = Int8Params\() s
+16.8 323 M (620:) s
+43.8 323 M
+(                super\(\).to\(device=device, dtype=dtype, non_blocking=non_blocking\),) s
+16.8 313 M (621:) s
+43.8 313 M
+(                requires_grad=self.requires_grad,) s
+16.8 303 M (622:) s
+43.8 303 M
+(                has_fp16_weights=self.has_fp16_weights,) s
+16.8 293 M (623:) s
+43.8 293 M
+(            \)) s
+16.8 283 M (624:) s
+43.8 283 M
+(            new_param.CB = self.CB) s
+16.8 273 M (625:) s
+43.8 273 M
+(            new_param.SCB = self.SCB) s
+16.8 263 M (626:) s
+16.8 253 M (627:) s
+43.8 253 M
+(            return new_param) s
+16.8 243 M (628:) s
+16.8 233 M (629:) s
+16.8 223 M (630:) s
+43.8 223 M
+(def maybe_rearrange_weight\(state_dict, prefix, local_metadata, strict, missing_keys, unexpecte) s
+5 213 M
+(d_keys, error_msgs\):) s
+16.8 203 M (631:) s
+43.8 203 M
+(    weight = state_dict.get\(f"{prefix}weight"\)) s
+16.8 193 M (632:) s
+43.8 193 M
+(    if weight is None:) s
+16.8 183 M (633:) s
+43.8 183 M
+(        # if the state dict has no weights for this layer \(e.g., LoRA finetuning\), do nothing) s
+16.8 173 M (634:) s
+43.8 173 M
+(        return) s
+16.8 163 M (635:) s
+43.8 163 M
+(    weight_format = state_dict.pop\(f"{prefix}weight_format", "row"\)) s
+16.8 153 M (636:) s
+16.8 143 M (637:) s
+43.8 143 M
+(    if isinstance\(weight_format, torch.Tensor\):) s
+16.8 133 M (638:) s
+43.8 133 M
+(        weight_format = weight_format.item\(\)) s
+16.8 123 M (639:) s
+16.8 113 M (640:) s
+43.8 113 M
+(    # For new weights format storage type, we explicitly check) s
+16.8 103 M (641:) s
+43.8 103 M
+(    # if weights_format is on the mapping) s
+16.8 93 M (642:) s
+43.8 93 M
+(    if isinstance\(weight_format, int\) and weight_format not in INVERSE_LINEAR_8BIT_WEIGHTS_FOR) s
+5 83 M
+(MAT_MAPPING:) s
+16.8 73 M (643:) s
+43.8 73 M
+(        raise ValueError\(f"Expected supported weight format - got {weight_format}"\)) s
+16.8 63 M (644:) s
+43.8 63 M
+(    elif isinstance\(weight_format, int\) and weight_format in INVERSE_LINEAR_8BIT_WEIGHTS_FORMA) s
+5 53 M
+(T_MAPPING:) s
+16.8 43 M (645:) s
+43.8 43 M
+(        weight_format = INVERSE_LINEAR_8BIT_WEIGHTS_FORMAT_MAPPING[weight_format]) s
+16.8 33 M (646:) s
+16.8 23 M (647:) s
+43.8 23 M
+(    if weight_format != "row":) s
+16.8 13 M (648:) s
+43.8 13 M
+(        tile_indices = get_tile_inds\(weight_format, weight.device\)) s
+16.8 3 M (649:) s
+43.8 3 M
+(        state_dict[f"{prefix}weight"] = undo_layout\(weight, tile_indices\)) s
+_R
+S
+%%Page: (10) 10
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 10 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (10) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (650:) s
+16.8 733 M (651:) s
+16.8 723 M (652:) s
+43.8 723 M
+(class Embedding8bit\(nn.Embedding\):) s
+16.8 713 M (653:) s
+43.8 713 M
+(    def __init__\() s
+16.8 703 M (654:) s
+43.8 703 M
+(            self,) s
+16.8 693 M (655:) s
+43.8 693 M
+(            num_embeddings: int,) s
+16.8 683 M (656:) s
+43.8 683 M
+(            embedding_dim: int,) s
+16.8 673 M (657:) s
+43.8 673 M
+(            padding_idx: Optional[int] = None,) s
+16.8 663 M (658:) s
+43.8 663 M
+(            device: Optional[device] = None,) s
+16.8 653 M (659:) s
+43.8 653 M
+(    \):) s
+16.8 643 M (660:) s
+43.8 643 M
+(        super\(\).__init__\() s
+16.8 633 M (661:) s
+43.8 633 M
+(            num_embeddings=num_embeddings,) s
+16.8 623 M (662:) s
+43.8 623 M
+(            embedding_dim=embedding_dim,) s
+16.8 613 M (663:) s
+43.8 613 M
+(            padding_idx=padding_idx,) s
+16.8 603 M (664:) s
+43.8 603 M
+(            device='meta',) s
+16.8 593 M (665:) s
+43.8 593 M
+(            dtype=torch.float16,) s
+16.8 583 M (666:) s
+43.8 583 M
+(            _freeze=True,) s
+16.8 573 M (667:) s
+43.8 573 M
+(        \)) s
+16.8 563 M (668:) s
+16.8 553 M (669:) s
+43.8 553 M
+(        self.weight = Int8Params\() s
+16.8 543 M (670:) s
+43.8 543 M
+(            torch.empty\(\(num_embeddings, embedding_dim\), dtype=torch.float16, device=device\),) s
+16.8 533 M (671:) s
+43.8 533 M
+(            has_fp16_weights=False,) s
+16.8 523 M (672:) s
+43.8 523 M
+(            requires_grad=False,) s
+16.8 513 M (673:) s
+43.8 513 M
+(        \)) s
+16.8 503 M (674:) s
+43.8 503 M
+(        self.SCB = nn.Parameter\() s
+16.8 493 M (675:) s
+43.8 493 M
+(            torch.empty\(\(num_embeddings,\), dtype=torch.float32, device=device\),) s
+16.8 483 M (676:) s
+43.8 483 M
+(            requires_grad=False,) s
+16.8 473 M (677:) s
+43.8 473 M
+(        \)) s
+16.8 463 M (678:) s
+16.8 453 M (679:) s
+43.8 453 M
+(    def _are_row_stats_initialized\(self\):) s
+16.8 443 M (680:) s
+43.8 443 M
+(        if self.weight.SCB) s
+16.8 433 M (681:) s
+43.8 433 M
+(        if self.weight.) s
+16.8 423 M (682:) s
+16.8 413 M (683:) s
+43.8 413 M
+(        return self.SCB.data.device != torch.device\('meta'\)) s
+16.8 403 M (684:) s
+16.8 393 M (685:) s
+43.8 393 M
+(    def _init_row_stats\(self\):) s
+16.8 383 M (686:) s
+43.8 383 M
+(        assert hasattr\(self.weight, 'SCB'\), 'embeddings are not quantized, call .cuda\(\) before) s
+5 373 M
+( forward') s
+16.8 363 M (687:) s
+16.8 353 M (688:) s
+43.8 353 M
+(        self.SCB.data = self.weight.SCB) s
+16.8 343 M (689:) s
+16.8 333 M (690:) s
+43.8 333 M
+(    def forward\(self, input: Tensor\) -> Tensor:) s
+16.8 323 M (691:) s
+43.8 323 M
+(        if not self._are_row_stats_initialized\(\):) s
+16.8 313 M (692:) s
+43.8 313 M
+(            self._init_row_stats\(\)) s
+16.8 303 M (693:) s
+16.8 293 M (694:) s
+43.8 293 M
+(        CB = self.weight.data) s
+16.8 283 M (695:) s
+43.8 283 M
+(        assert CB.dtype == torch.int8) s
+16.8 273 M (696:) s
+43.8 273 M
+(        assert CB.shape == \(self.num_embeddings, self.embedding_dim\)) s
+16.8 263 M (697:) s
+16.8 253 M (698:) s
+43.8 253 M
+(        compressed_output = F.embedding\() s
+16.8 243 M (699:) s
+43.8 243 M
+(            input=input,) s
+16.8 233 M (700:) s
+43.8 233 M
+(            weight=CB,) s
+16.8 223 M (701:) s
+43.8 223 M
+(            padding_idx=self.padding_idx,) s
+16.8 213 M (702:) s
+43.8 213 M
+(        \)) s
+16.8 203 M (703:) s
+16.8 193 M (704:) s
+43.8 193 M
+(        assert self.SCB.shape == \(self.num_embeddings,\)) s
+16.8 183 M (705:) s
+16.8 173 M (706:) s
+43.8 173 M
+(        output_scales = F.embedding\() s
+16.8 163 M (707:) s
+43.8 163 M
+(            input=input,) s
+16.8 153 M (708:) s
+43.8 153 M
+(            weight=self.SCB.view\(self.num_embeddings, 1\),) s
+16.8 143 M (709:) s
+43.8 143 M
+(            padding_idx=self.padding_idx,) s
+16.8 133 M (710:) s
+43.8 133 M
+(        \)) s
+16.8 123 M (711:) s
+16.8 113 M (712:) s
+43.8 113 M
+(        output = compressed_output.to\(torch.float16\)) s
+16.8 103 M (713:) s
+43.8 103 M
+(        output *= \(output_scales / 127.0\)) s
+16.8 93 M (714:) s
+16.8 83 M (715:) s
+43.8 83 M
+(        return output) s
+16.8 73 M (716:) s
+16.8 63 M (717:) s
+16.8 53 M (718:) s
+43.8 53 M
+(class Linear8bitLt\(nn.Linear\):) s
+16.8 43 M (719:) s
+43.8 43 M
+(    """) s
+16.8 33 M (720:) s
+43.8 33 M
+(    This class is the base module for the [LLM.int8\(\)]\(https://arxiv.org/abs/2208.07339\) algor) s
+5 23 M
+(ithm.) s
+16.8 13 M (721:) s
+43.8 13 M
+(    To read more about it, have a look at the paper.) s
+16.8 3 M (722:) s
+_R
+S
+%%Page: (11) 11
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 11 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (11) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (723:) s
+43.8 743 M
+(    In order to quantize a linear layer one should first load the original fp16 / bf16 weights) s
+5 733 M
+( into) s
+16.8 723 M (724:) s
+43.8 723 M
+(    the Linear8bitLt module, then call `int8_module.to\("cuda"\)` to quantize the fp16 weights.) s
+16.8 713 M (725:) s
+16.8 703 M (726:) s
+43.8 703 M
+(    Example:) s
+16.8 693 M (727:) s
+16.8 683 M (728:) s
+43.8 683 M
+(    ```python) s
+16.8 673 M (729:) s
+43.8 673 M
+(    import torch) s
+16.8 663 M (730:) s
+43.8 663 M
+(    import torch.nn as nn) s
+16.8 653 M (731:) s
+16.8 643 M (732:) s
+43.8 643 M
+(    import bitsandbytes as bnb) s
+16.8 633 M (733:) s
+43.8 633 M
+(    from bnb.nn import Linear8bitLt) s
+16.8 623 M (734:) s
+16.8 613 M (735:) s
+43.8 613 M
+(    fp16_model = nn.Sequential\() s
+16.8 603 M (736:) s
+43.8 603 M
+(        nn.Linear\(64, 64\),) s
+16.8 593 M (737:) s
+43.8 593 M
+(        nn.Linear\(64, 64\)) s
+16.8 583 M (738:) s
+43.8 583 M
+(    \)) s
+16.8 573 M (739:) s
+16.8 563 M (740:) s
+43.8 563 M
+(    int8_model = nn.Sequential\() s
+16.8 553 M (741:) s
+43.8 553 M
+(        Linear8bitLt\(64, 64, has_fp16_weights=False\),) s
+16.8 543 M (742:) s
+43.8 543 M
+(        Linear8bitLt\(64, 64, has_fp16_weights=False\)) s
+16.8 533 M (743:) s
+43.8 533 M
+(    \)) s
+16.8 523 M (744:) s
+16.8 513 M (745:) s
+43.8 513 M
+(    int8_model.load_state_dict\(fp16_model.state_dict\(\)\)) s
+16.8 503 M (746:) s
+43.8 503 M
+(    int8_model = int8_model.to\(0\) # Quantization happens here) s
+16.8 493 M (747:) s
+43.8 493 M
+(    ```) s
+16.8 483 M (748:) s
+43.8 483 M
+(    """) s
+16.8 473 M (749:) s
+16.8 463 M (750:) s
+43.8 463 M
+(    def __init__\() s
+16.8 453 M (751:) s
+43.8 453 M
+(        self,) s
+16.8 443 M (752:) s
+43.8 443 M
+(        input_features: int,) s
+16.8 433 M (753:) s
+43.8 433 M
+(        output_features: int,) s
+16.8 423 M (754:) s
+43.8 423 M
+(        bias=True,) s
+16.8 413 M (755:) s
+43.8 413 M
+(        has_fp16_weights=True,) s
+16.8 403 M (756:) s
+43.8 403 M
+(        memory_efficient_backward=False,) s
+16.8 393 M (757:) s
+43.8 393 M
+(        threshold=0.0,) s
+16.8 383 M (758:) s
+43.8 383 M
+(        index=None,) s
+16.8 373 M (759:) s
+43.8 373 M
+(        device=None,) s
+16.8 363 M (760:) s
+43.8 363 M
+(    \):) s
+16.8 353 M (761:) s
+43.8 353 M
+(        """) s
+16.8 343 M (762:) s
+43.8 343 M
+(        Initialize Linear8bitLt class.) s
+16.8 333 M (763:) s
+16.8 323 M (764:) s
+43.8 323 M
+(        Args:) s
+16.8 313 M (765:) s
+43.8 313 M
+(            input_features \(`int`\):) s
+16.8 303 M (766:) s
+43.8 303 M
+(                Number of input features of the linear layer.) s
+16.8 293 M (767:) s
+43.8 293 M
+(            output_features \(`int`\):) s
+16.8 283 M (768:) s
+43.8 283 M
+(                Number of output features of the linear layer.) s
+16.8 273 M (769:) s
+43.8 273 M
+(            bias \(`bool`, defaults to `True`\):) s
+16.8 263 M (770:) s
+43.8 263 M
+(                Whether the linear class uses the bias term as well.) s
+16.8 253 M (771:) s
+43.8 253 M
+(        """) s
+16.8 243 M (772:) s
+43.8 243 M
+(        super\(\).__init__\(input_features, output_features, bias, device\)) s
+16.8 233 M (773:) s
+43.8 233 M
+(        assert not memory_efficient_backward, "memory_efficient_backward is no longer required) s
+5 223 M
+( and the argument is deprecated in 0.37.0 and will be removed in 0.39.0") s
+16.8 213 M (774:) s
+43.8 213 M
+(        self.state = bnb.MatmulLtState\(\)) s
+16.8 203 M (775:) s
+43.8 203 M
+(        self.index = index) s
+16.8 193 M (776:) s
+16.8 183 M (777:) s
+43.8 183 M
+(        self.state.threshold = threshold) s
+16.8 173 M (778:) s
+43.8 173 M
+(        self.state.has_fp16_weights = has_fp16_weights) s
+16.8 163 M (779:) s
+43.8 163 M
+(        self.state.memory_efficient_backward = memory_efficient_backward) s
+16.8 153 M (780:) s
+43.8 153 M
+(        if threshold > 0.0 and not has_fp16_weights:) s
+16.8 143 M (781:) s
+43.8 143 M
+(            self.state.use_pool = True) s
+16.8 133 M (782:) s
+16.8 123 M (783:) s
+43.8 123 M
+(        self.weight = Int8Params\(self.weight.data, has_fp16_weights=has_fp16_weights, requires) s
+5 113 M
+(_grad=has_fp16_weights\)) s
+16.8 103 M (784:) s
+43.8 103 M
+(        self._register_load_state_dict_pre_hook\(maybe_rearrange_weight\)) s
+16.8 93 M (785:) s
+16.8 83 M (786:) s
+43.8 83 M
+(    def _save_to_state_dict\(self, destination, prefix, keep_vars\):) s
+16.8 73 M (787:) s
+43.8 73 M
+(        super\(\)._save_to_state_dict\(destination, prefix, keep_vars\)) s
+16.8 63 M (788:) s
+16.8 53 M (789:) s
+43.8 53 M
+(        # we only need to save SCB as extra data, because CB for quantized weights is already ) s
+5 43 M
+(stored in weight.data) s
+16.8 33 M (790:) s
+43.8 33 M
+(        scb_name = "SCB") s
+16.8 23 M (791:) s
+16.8 13 M (792:) s
+43.8 13 M
+(        # case 1: .cuda was called, SCB is in self.weight) s
+16.8 3 M (793:) s
+43.8 3 M
+(        param_from_weight = getattr\(self.weight, scb_name\)) s
+_R
+S
+%%Page: (12) 12
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 12 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (12) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (794:) s
+43.8 743 M
+(        # case 2: self.init_8bit_state was called, SCB is in self.state) s
+16.8 733 M (795:) s
+43.8 733 M
+(        param_from_state = getattr\(self.state, scb_name\)) s
+16.8 723 M (796:) s
+43.8 723 M
+(        # case 3: SCB is in self.state, weight layout reordered after first forward\(\)) s
+16.8 713 M (797:) s
+43.8 713 M
+(        layout_reordered = self.state.CxB is not None) s
+16.8 703 M (798:) s
+16.8 693 M (799:) s
+43.8 693 M
+(        key_name = prefix + f"{scb_name}") s
+16.8 683 M (800:) s
+43.8 683 M
+(        format_name = prefix + "weight_format") s
+16.8 673 M (801:) s
+16.8 663 M (802:) s
+43.8 663 M
+(        if not self.state.has_fp16_weights:) s
+16.8 653 M (803:) s
+43.8 653 M
+(            if param_from_weight is not None:) s
+16.8 643 M (804:) s
+43.8 643 M
+(                destination[key_name] = param_from_weight if keep_vars else param_from_weight.) s
+5 633 M
+(detach\(\)) s
+16.8 623 M (805:) s
+43.8 623 M
+(                destination[format_name] = torch.tensor\(0, dtype=torch.uint8\)) s
+16.8 613 M (806:) s
+43.8 613 M
+(            elif param_from_state is not None and not layout_reordered:) s
+16.8 603 M (807:) s
+43.8 603 M
+(                destination[key_name] = param_from_state if keep_vars else param_from_state.de) s
+5 593 M
+(tach\(\)) s
+16.8 583 M (808:) s
+43.8 583 M
+(                destination[format_name] = torch.tensor\(0, dtype=torch.uint8\)) s
+16.8 573 M (809:) s
+43.8 573 M
+(            elif param_from_state is not None:) s
+16.8 563 M (810:) s
+43.8 563 M
+(                destination[key_name] = param_from_state if keep_vars else param_from_state.de) s
+5 553 M
+(tach\(\)) s
+16.8 543 M (811:) s
+43.8 543 M
+(                weights_format = self.state.formatB) s
+16.8 533 M (812:) s
+43.8 533 M
+(                # At this point `weights_format` is an str) s
+16.8 523 M (813:) s
+43.8 523 M
+(                if weights_format not in LINEAR_8BIT_WEIGHTS_FORMAT_MAPPING:) s
+16.8 513 M (814:) s
+43.8 513 M
+(                    raise ValueError\(f"Unrecognized weights format {weights_format}"\)) s
+16.8 503 M (815:) s
+16.8 493 M (816:) s
+43.8 493 M
+(                weights_format = LINEAR_8BIT_WEIGHTS_FORMAT_MAPPING[weights_format]) s
+16.8 483 M (817:) s
+16.8 473 M (818:) s
+43.8 473 M
+(                destination[format_name] = torch.tensor\(weights_format, dtype=torch.uint8\)) s
+16.8 463 M (819:) s
+16.8 453 M (820:) s
+43.8 453 M
+(    def _load_from_state_dict\() s
+16.8 443 M (821:) s
+43.8 443 M
+(        self,) s
+16.8 433 M (822:) s
+43.8 433 M
+(        state_dict,) s
+16.8 423 M (823:) s
+43.8 423 M
+(        prefix,) s
+16.8 413 M (824:) s
+43.8 413 M
+(        local_metadata,) s
+16.8 403 M (825:) s
+43.8 403 M
+(        strict,) s
+16.8 393 M (826:) s
+43.8 393 M
+(        missing_keys,) s
+16.8 383 M (827:) s
+43.8 383 M
+(        unexpected_keys,) s
+16.8 373 M (828:) s
+43.8 373 M
+(        error_msgs,) s
+16.8 363 M (829:) s
+43.8 363 M
+(    \):) s
+16.8 353 M (830:) s
+43.8 353 M
+(        super\(\)._load_from_state_dict\() s
+16.8 343 M (831:) s
+43.8 343 M
+(            state_dict,) s
+16.8 333 M (832:) s
+43.8 333 M
+(            prefix,) s
+16.8 323 M (833:) s
+43.8 323 M
+(            local_metadata,) s
+16.8 313 M (834:) s
+43.8 313 M
+(            strict,) s
+16.8 303 M (835:) s
+43.8 303 M
+(            missing_keys,) s
+16.8 293 M (836:) s
+43.8 293 M
+(            unexpected_keys,) s
+16.8 283 M (837:) s
+43.8 283 M
+(            error_msgs,) s
+16.8 273 M (838:) s
+43.8 273 M
+(        \)) s
+16.8 263 M (839:) s
+43.8 263 M
+(        unexpected_copy = list\(unexpected_keys\)) s
+16.8 253 M (840:) s
+16.8 243 M (841:) s
+43.8 243 M
+(        for key in unexpected_copy:) s
+16.8 233 M (842:) s
+43.8 233 M
+(            input_name = key[len\(prefix\) :]) s
+16.8 223 M (843:) s
+43.8 223 M
+(            if input_name == "SCB":) s
+16.8 213 M (844:) s
+43.8 213 M
+(                if self.weight.SCB is None:) s
+16.8 203 M (845:) s
+43.8 203 M
+(                    # buffers not yet initialized, can't access them directly without quantizi) s
+5 193 M
+(ng first) s
+16.8 183 M (846:) s
+43.8 183 M
+(                    raise RuntimeError\() s
+16.8 173 M (847:) s
+43.8 173 M
+(                        "Loading a quantized checkpoint into non-quantized Linear8bitLt is ") s
+16.8 163 M (848:) s
+43.8 163 M
+(                        "not supported. Please call module.cuda\(\) before module.load_state_dic) s
+5 153 M
+(t\(\)",) s
+16.8 143 M (849:) s
+43.8 143 M
+(                    \)) s
+16.8 133 M (850:) s
+16.8 123 M (851:) s
+43.8 123 M
+(                input_param = state_dict[key]) s
+16.8 113 M (852:) s
+43.8 113 M
+(                self.weight.SCB.copy_\(input_param\)) s
+16.8 103 M (853:) s
+16.8 93 M (854:) s
+43.8 93 M
+(                if self.state.SCB is not None:) s
+16.8 83 M (855:) s
+43.8 83 M
+(                    self.state.SCB = self.weight.SCB) s
+16.8 73 M (856:) s
+16.8 63 M (857:) s
+43.8 63 M
+(                unexpected_keys.remove\(key\)) s
+16.8 53 M (858:) s
+16.8 43 M (859:) s
+43.8 43 M
+(    def init_8bit_state\(self\):) s
+16.8 33 M (860:) s
+43.8 33 M
+(        self.state.CB = self.weight.CB) s
+16.8 23 M (861:) s
+43.8 23 M
+(        self.state.SCB = self.weight.SCB) s
+16.8 13 M (862:) s
+43.8 13 M
+(        self.weight.CB = None) s
+16.8 3 M (863:) s
+43.8 3 M
+(        self.weight.SCB = None) s
+_R
+S
+%%Page: (13) 13
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 13 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (13) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+16.8 743 M (864:) s
+16.8 733 M (865:) s
+43.8 733 M
+(    def forward\(self, x: torch.Tensor\):) s
+16.8 723 M (866:) s
+43.8 723 M
+(        self.state.is_training = self.training) s
+16.8 713 M (867:) s
+43.8 713 M
+(        if self.weight.CB is not None:) s
+16.8 703 M (868:) s
+43.8 703 M
+(            self.init_8bit_state\(\)) s
+16.8 693 M (869:) s
+16.8 683 M (870:) s
+43.8 683 M
+(        # weights are cast automatically as Int8Params, but the bias has to be cast manually) s
+16.8 673 M (871:) s
+43.8 673 M
+(        if self.bias is not None and self.bias.dtype != x.dtype:) s
+16.8 663 M (872:) s
+43.8 663 M
+(            self.bias.data = self.bias.data.to\(x.dtype\)) s
+16.8 653 M (873:) s
+16.8 643 M (874:) s
+43.8 643 M
+(        out = bnb.matmul\(x, self.weight, bias=self.bias, state=self.state\)) s
+16.8 633 M (875:) s
+16.8 623 M (876:) s
+43.8 623 M
+(        if not self.state.has_fp16_weights:) s
+16.8 613 M (877:) s
+43.8 613 M
+(            if self.state.CB is not None and self.state.CxB is not None:) s
+16.8 603 M (878:) s
+43.8 603 M
+(                # we converted 8-bit row major to turing/ampere format in the first inference ) s
+5 593 M
+(pass) s
+16.8 583 M (879:) s
+43.8 583 M
+(                # we no longer need the row-major weight) s
+16.8 573 M (880:) s
+43.8 573 M
+(                del self.state.CB) s
+16.8 563 M (881:) s
+43.8 563 M
+(                self.weight.data = self.state.CxB) s
+16.8 553 M (882:) s
+43.8 553 M
+(        return out) s
+16.8 543 M (883:) s
+16.8 533 M (884:) s
+16.8 523 M (885:) s
+43.8 523 M
+(class OutlierAwareLinear\(nn.Linear\):) s
+16.8 513 M (886:) s
+43.8 513 M
+(    def __init__\(self, input_features, output_features, bias=True, device=None\):) s
+16.8 503 M (887:) s
+43.8 503 M
+(        super\(\).__init__\(input_features, output_features, bias, device\)) s
+16.8 493 M (888:) s
+43.8 493 M
+(        self.outlier_dim = None) s
+16.8 483 M (889:) s
+43.8 483 M
+(        self.is_quantized = False) s
+16.8 473 M (890:) s
+16.8 463 M (891:) s
+43.8 463 M
+(    def forward_with_outliers\(self, x, outlier_idx\):) s
+16.8 453 M (892:) s
+43.8 453 M
+(        raise NotImplementedError\("Please override the `forward_with_outliers\(self, x, outlier) s
+5 443 M
+(_idx\)` function"\)) s
+16.8 433 M (893:) s
+16.8 423 M (894:) s
+43.8 423 M
+(    def quantize_weight\(self, w, outlier_idx\):) s
+16.8 413 M (895:) s
+43.8 413 M
+(        raise NotImplementedError\("Please override the `quantize_weights\(self, w, outlier_idx\)) s
+5 403 M
+(` function"\)) s
+16.8 393 M (896:) s
+16.8 383 M (897:) s
+43.8 383 M
+(    def forward\(self, x\):) s
+16.8 373 M (898:) s
+43.8 373 M
+(        if self.outlier_dim is None:) s
+16.8 363 M (899:) s
+43.8 363 M
+(            tracer = OutlierTracer.get_instance\(\)) s
+16.8 353 M (900:) s
+43.8 353 M
+(            if not tracer.is_initialized\(\):) s
+16.8 343 M (901:) s
+43.8 343 M
+(                print\("Please use OutlierTracer.initialize\(model\) before using the OutlierAwar) s
+5 333 M
+(eLinear layer"\)) s
+16.8 323 M (902:) s
+43.8 323 M
+(            outlier_idx = tracer.get_outliers\(self.weight\)) s
+16.8 313 M (903:) s
+43.8 313 M
+(            # print\(outlier_idx, tracer.get_hvalue\(self.weight\)\)) s
+16.8 303 M (904:) s
+43.8 303 M
+(            self.outlier_dim = outlier_idx) s
+16.8 293 M (905:) s
+16.8 283 M (906:) s
+43.8 283 M
+(        if not self.is_quantized:) s
+16.8 273 M (907:) s
+43.8 273 M
+(            w = self.quantize_weight\(self.weight, self.outlier_dim\)) s
+16.8 263 M (908:) s
+43.8 263 M
+(            self.weight.data.copy_\(w\)) s
+16.8 253 M (909:) s
+43.8 253 M
+(            self.is_quantized = True) s
+16.8 243 M (910:) s
+16.8 233 M (911:) s
+16.8 223 M (912:) s
+43.8 223 M
+(class SwitchBackLinearBnb\(nn.Linear\):) s
+16.8 213 M (913:) s
+43.8 213 M
+(    def __init__\() s
+16.8 203 M (914:) s
+43.8 203 M
+(        self,) s
+16.8 193 M (915:) s
+43.8 193 M
+(        input_features,) s
+16.8 183 M (916:) s
+43.8 183 M
+(        output_features,) s
+16.8 173 M (917:) s
+43.8 173 M
+(        bias=True,) s
+16.8 163 M (918:) s
+43.8 163 M
+(        has_fp16_weights=True,) s
+16.8 153 M (919:) s
+43.8 153 M
+(        memory_efficient_backward=False,) s
+16.8 143 M (920:) s
+43.8 143 M
+(        threshold=0.0,) s
+16.8 133 M (921:) s
+43.8 133 M
+(        index=None,) s
+16.8 123 M (922:) s
+43.8 123 M
+(        device=None,) s
+16.8 113 M (923:) s
+43.8 113 M
+(    \):) s
+16.8 103 M (924:) s
+43.8 103 M
+(        super\(\).__init__\(input_features, output_features, bias, device\)) s
+16.8 93 M (925:) s
+43.8 93 M
+(        self.state = bnb.MatmulLtState\(\)) s
+16.8 83 M (926:) s
+43.8 83 M
+(        self.index = index) s
+16.8 73 M (927:) s
+16.8 63 M (928:) s
+43.8 63 M
+(        self.state.threshold = threshold) s
+16.8 53 M (929:) s
+43.8 53 M
+(        self.state.has_fp16_weights = has_fp16_weights) s
+16.8 43 M (930:) s
+43.8 43 M
+(        self.state.memory_efficient_backward = memory_efficient_backward) s
+16.8 33 M (931:) s
+43.8 33 M
+(        if threshold > 0.0 and not has_fp16_weights:) s
+16.8 23 M (932:) s
+43.8 23 M
+(            self.state.use_pool = True) s
+16.8 13 M (933:) s
+16.8 3 M (934:) s
+43.8 3 M
+(        self.weight = Int8Params\(self.weight.data, has_fp16_weights=has_fp16_weights, requires) s
+_R
+S
+%%Page: (14) 14
+%%BeginPageSetup
+_S
+18 36 translate
+/pagenum 14 def
+/fname (modules.py) def
+/fdir (.) def
+/ftail (modules.py) def
+% User defined strings:
+/fmodstr (Thu Jun 27 17:03:54 2024) def
+/pagenumstr (14) def
+/user_header_p false def
+/user_footer_p false def
+%%EndPageSetup
+do_header
+5 743 M
+(_grad=has_fp16_weights\)) s
+16.8 733 M (935:) s
+16.8 723 M (936:) s
+43.8 723 M
+(    def init_8bit_state\(self\):) s
+16.8 713 M (937:) s
+43.8 713 M
+(        self.state.CB = self.weight.CB) s
+16.8 703 M (938:) s
+43.8 703 M
+(        self.state.SCB = self.weight.SCB) s
+16.8 693 M (939:) s
+43.8 693 M
+(        self.weight.CB = None) s
+16.8 683 M (940:) s
+43.8 683 M
+(        self.weight.SCB = None) s
+16.8 673 M (941:) s
+16.8 663 M (942:) s
+43.8 663 M
+(    def forward\(self, x\):) s
+16.8 653 M (943:) s
+43.8 653 M
+(        self.state.is_training = self.training) s
+16.8 643 M (944:) s
+16.8 633 M (945:) s
+43.8 633 M
+(        if self.weight.CB is not None:) s
+16.8 623 M (946:) s
+43.8 623 M
+(            self.init_8bit_state\(\)) s
+16.8 613 M (947:) s
+16.8 603 M (948:) s
+43.8 603 M
+(        out = bnb.matmul_mixed\(x.half\(\), self.weight.half\(\), bias=None, state=self.state\) + se) s
+5 593 M
+(lf.bias) s
+_R
+S
+%%Trailer
+%%Pages: 14
+%%DocumentNeededResources: font Courier-Bold Courier 
+%%EOF
