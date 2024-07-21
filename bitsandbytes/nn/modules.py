@@ -660,7 +660,7 @@ class Embedding8bit(nn.Embedding):
     """
     This class implements [LLM.int8()](https://arxiv.org/abs/2208.07339) algorithm for embedding layer
 
-    Quantization API is simillar to Linear8bitLt:
+    Quantization API is similar to Linear8bitLt:
     ```python
     import torch
     import torch.nn as nn
@@ -706,7 +706,7 @@ class Embedding4bit(nn.Embedding):
     This is the base class similar to Linear4bit. It implements 4 bit 4-bit quantization algorithm presented in
     [QLoRA](https://arxiv.org/abs/2305.14314) for embeddings.
 
-    Quantization API is simillar to Linear4bit:
+    Quantization API is similar to Linear4bit:
     ```python
     import torch
     import torch.nn as nn
