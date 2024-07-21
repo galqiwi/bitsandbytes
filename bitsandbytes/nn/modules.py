@@ -714,11 +714,11 @@ class Embedding4bit(nn.Embedding):
     from bitsandbytes.nn import Embedding8bit
 
     fp16_module = nn.Embedding(128, 64)
-    int8_module = Embedding4bit(128, 64)
+    quantized_module = Embedding4bit(128, 64)
 
-    int8_module.load_state_dict(fp16_module.state_dict())
+    quantized_module.load_state_dict(fp16_module.state_dict())
 
-    int8_module = int8_module.to(0) # Quantization happens here
+    quantized_module = quantized_module.to(0) # Quantization happens here
     ```
     """
     def __init__(
