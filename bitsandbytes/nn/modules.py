@@ -664,7 +664,10 @@ class Embedding8bit(nn.Embedding):
         self.weight = Int8Params(self.weight.data, has_fp16_weights=False, requires_grad=False)
 
     def forward(self, input: Tensor) -> Tensor:
-        assert hasattr(self.weight, 'SCB'), 'did not .cuda()'
+        if not hasattr(self.weight, 'SCB'):
+            raise RuntimeError(
+                "Embedding layer is not quantized. Please call .cuda() or .to(device) first."
+            )
 
         rows = self.weight.data
         row_stats = self.weight.SCB
