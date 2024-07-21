@@ -338,6 +338,23 @@ class Params4bit(torch.nn.Parameter):
             return new_param
 
 
+def fix_4bit_weight_quant_state_from_module(module: Union["Embedding4bit", "Linear4bit"]):
+    if getattr(module.weight, "quant_state", None) is not None:
+        return
+
+    if getattr(module, "quant_state", None) is None:
+        warnings.warn(
+            "FP4 quantization state not initialized. Please call .cuda() or .to(device) on the LinearFP4 layer first.",
+        )
+
+    # the quant state got lost when the parameter got converted. This happens for example for fsdp
+    # since we registered the module, we can recover the state here
+    assert module.weight.shape[1] == 1
+    if not isinstance(module.weight, Params4bit):
+        module.weight = Params4bit(module.weight, quant_storage=module.quant_storage)
+    module.weight.quant_state = module.quant_state
+
+
 class Linear4bit(nn.Linear):
     """
     This class is the base module for the 4-bit quantization algorithm presented in [QLoRA](https://arxiv.org/abs/2305.14314).
@@ -637,23 +654,6 @@ def maybe_rearrange_weight(state_dict, prefix, local_metadata, strict, missing_k
     if weight_format != "row":
         tile_indices = get_tile_inds(weight_format, weight.device)
         state_dict[f"{prefix}weight"] = undo_layout(weight, tile_indices)
-
-
-def fix_4bit_weight_quant_state_from_module(module: Union["Embedding4bit", "Linear4bit"]):
-    if getattr(module.weight, "quant_state", None) is not None:
-        return
-
-    if getattr(module, "quant_state", None) is None:
-        warnings.warn(
-            "FP4 quantization state not initialized. Please call .cuda() or .to(device) on the LinearFP4 layer first.",
-        )
-
-    # the quant state got lost when the parameter got converted. This happens for example for fsdp
-    # since we registered the module, we can recover the state here
-    assert module.weight.shape[1] == 1
-    if not isinstance(module.weight, Params4bit):
-        module.weight = Params4bit(module.weight, quant_storage=module.quant_storage)
-    module.weight.quant_state = module.quant_state
 
 
 class Embedding8bit(nn.Embedding):
