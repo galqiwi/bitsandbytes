@@ -657,6 +657,24 @@ def maybe_rearrange_weight(state_dict, prefix, local_metadata, strict, missing_k
 
 
 class Embedding8bit(nn.Embedding):
+    """
+    This class implements [LLM.int8()](https://arxiv.org/abs/2208.07339) algorithm for embedding layer
+
+    Quantization API is simillar to Linear8bitLt:
+    ```python
+    import torch
+    import torch.nn as nn
+
+    from bitsandbytes.nn import Embedding8bit
+
+    fp16_module = nn.Embedding(128, 64)
+    int8_module = Embedding8bit(128, 64)
+
+    int8_module.load_state_dict(fp16_module.state_dict())
+
+    int8_module = int8_module.to(0) # Quantization happens here
+    ```
+    """
     def __init__(self, num_embeddings, embedding_dim, device=None, dtype=None):
         super().__init__(num_embeddings, embedding_dim, device=device, dtype=dtype)
         self.dtype = self.weight.data.dtype
@@ -684,6 +702,25 @@ class Embedding8bit(nn.Embedding):
 
 
 class Embedding4bit(nn.Embedding):
+    """
+    This is the base class similar to Linear4bit. It implements 4 bit 4-bit quantization algorithm presented in
+    [QLoRA](https://arxiv.org/abs/2305.14314) for embeddings.
+
+    Quantization API is simillar to Linear4bit:
+    ```python
+    import torch
+    import torch.nn as nn
+
+    from bitsandbytes.nn import Embedding8bit
+
+    fp16_module = nn.Embedding(128, 64)
+    int8_module = Embedding4bit(128, 64)
+
+    int8_module.load_state_dict(fp16_module.state_dict())
+
+    int8_module = int8_module.to(0) # Quantization happens here
+    ```
+    """
     def __init__(
         self,
         num_embeddings,
