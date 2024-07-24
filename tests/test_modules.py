@@ -776,3 +776,13 @@ def test_4bit_linear_weight_fsdp_fix():
     module(input_tensor)
 
     assert module.weight.quant_state is not None
+
+
+def test_embedding_not_implemented_error():
+    with pytest.raises(NotImplementedError):
+        emb = bnb.nn.Embedding4bit(32, 32)
+        emb.state_dict()
+
+    with pytest.raises(NotImplementedError):
+        emb = bnb.nn.Embedding8bit(32, 32)
+        emb.state_dict()

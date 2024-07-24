@@ -681,6 +681,9 @@ class Embedding8bit(nn.Embedding):
 
         self.weight = Int8Params(self.weight.data, has_fp16_weights=False, requires_grad=False)
 
+    def _save_to_state_dict(self, destination, prefix, keep_vars):
+        raise NotImplementedError("saving Embedding4bit module is not implemented")
+
     def forward(self, input: Tensor) -> Tensor:
         if not hasattr(self.weight, 'SCB'):
             raise RuntimeError(
@@ -787,6 +790,9 @@ class Embedding4bit(nn.Embedding):
         assert output.shape == (*input.shape, self.embedding_dim)
 
         return output.to(self.dtype)
+
+    def _save_to_state_dict(self, destination, prefix, keep_vars):
+        raise NotImplementedError("saving Embedding4bit module is not implemented")
 
     def forward(self, input: Tensor) -> Tensor:
         fix_4bit_weight_quant_state_from_module(self)
